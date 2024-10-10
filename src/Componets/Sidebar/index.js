@@ -1,7 +1,6 @@
 import useTitle from "../Hook/useTitle";
 
 const Sidebar = () => {
-  const title = useTitle("Home ")
     return (
       <div className="w-64 h-screen bg-gray-900 text-white p-4">
         <div className="text-xl font-bold mb-8">doit</div>

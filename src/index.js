@@ -1,15 +1,13 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom/client';
-import Sidebar from './Componets/Sidebar';
-import CardCenter from './Componets/CardCenter/CardCenter';
 import "./index.css"
+import Router from './router';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <div className="flex">
-    <Sidebar />
-    <CardCenter />
-  </div>
+    <Fragment>
+        <Router />
+    </Fragment>
 );
 
