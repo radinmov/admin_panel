@@ -8,11 +8,11 @@ import { Home } from "./Pages/HomePage";
 
 const routes = createBrowserRouter([
   {
-    path: '/',
+    path: '/admin/home',
     element: <Home />
   },
   {
-    path: '/login',
+    path: '/',
     element: <SignIn />
   },
 
