@@ -4,7 +4,7 @@ import UserList from "../../Componets/User_list/index";
 import useTitle from "../../Componets/Hook/useTitle";
 
 export function Home() {
-  const title = useTitle("Home ");
+  const title = useTitle("Home");
   
   return (
     <div className="flex">
