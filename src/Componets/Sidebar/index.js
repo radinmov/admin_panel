@@ -4,13 +4,8 @@ const Sidebar = () => {
       <div className="text-xl font-bold mb-8">admin_panel</div>
       <nav>
         <ul>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">Dashboard</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">Transactions</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">Deposit</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">deoisits</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">leves</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">unconfirmd_transaction</a></li>
-          <li className="mb-4"><a href="#" className="hover:text-blue-500 font-bold">leves</a></li>
+          <li className="mb-4"><a href="/admin/home" className="hover:text-blue-500 font-bold">Dashboard</a></li>
+          <li className="mb-4"><a href="/admin/unconfirmed-transactions" className="hover:text-blue-500 font-bold">unconfirmd_transaction</a></li>
         </ul>
       </nav>
     </div>
