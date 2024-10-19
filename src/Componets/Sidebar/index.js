@@ -52,7 +52,7 @@ const Sidebar = () => {
               onClick={() => handleNavigation("/admin/settings")}
               className="hover:text-blue-500 font-bold"
             >
-              Settings
+              Settings(levels)
             </button>
           </li>
           <li className="mb-4">
