@@ -1,37 +1,32 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import Swal from 'sweetalert2';
 import useTitle from '../../Componets/Hook/useTitle';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
-    const title = useTitle("admin_Login")
+    useTitle("admin_Login");
     const [phone, setPhone] = useState("");
-    const [code, setCode] = useState("");
+    const navigate =useNavigate()
+    const [password, setpassword] = useState("");
 
     function handleLogin(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        const auth_inputs = [
-            { name: "phone", value: phone },
-            { name: "Code", value: code }
-        ];
-
-        for (const field of auth_inputs) {
-            if (!field.value || field.value.length === 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "You must enter something...",
-                });
-                return;
-            }
+        if (!phone || !password) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "You must enter both phone number and password!",
+            });
+            return;
         }
 
         const data = JSON.stringify({
             phone_number: phone,
-            verify_code: code,
+            verify_password: password,
         });
 
-        fetch("http://195.248.242.69:5006/user/login", {
+        fetch("/api/admin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -40,20 +35,16 @@ export default function Login() {
         })
             .then((response) => response.json())
             .then((result) => {
-                let token = result.token;
-
+                const token = result.token;
                 if (token) {
-                    if (token.startsWith("b'") || token.startsWith('b"')) {
-                        token = token.slice(2, -1);
-                    }
-
-
+                    localStorage.setItem('token', token);
 
                     Swal.fire({
                         icon: 'success',
                         title: 'Success!',
                         text: 'Login successful!',
                     });
+                    navigate("/admin/home")
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -72,7 +63,6 @@ export default function Login() {
             });
     }
 
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
@@ -85,7 +75,7 @@ export default function Login() {
                     </div>
                     <form className="mt-8 space-y-4" onSubmit={handleLogin}>
                         <div>
-                            <label className="block text-gray-700">Your User Name</label>
+                            <label className="block text-gray-700">Your Phone Number</label>
                             <input
                                 onChange={(e) => setPhone(e.target.value)}
                                 type="text"
@@ -94,11 +84,11 @@ export default function Login() {
                             />
                         </div>
                         <div>
-                            <label className="block text-gray-700">PassWord</label>
+                            <label className="block text-gray-700">password</label>
                             <input
-                                onChange={(e) => setCode(e.target.value)}
+                                onChange={(e) => setpassword(e.target.value)}
                                 type="text"
-                                placeholder="Your code"
+                                placeholder="Your password"
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>

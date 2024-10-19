@@ -1,28 +1,60 @@
-// UserList.js
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2"; 
 
 const UserList = () => {
   const users = [
     { id: 1, name: 'Brooklyn Simmons', department: 'Software', phone: '000-000-0000', email: 'bsimmons@example.com' },
     { id: 2, name: 'Aubrie Heuser', department: 'Product', phone: '000-000-0001', email: 'aheuser@example.com' },
     { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    // Add more users as needed
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
+    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
   ];
 
   const navigate = useNavigate();
 
-  const handleButtonClick = (userId) => {
-    navigate(`/admin/transactions/user/${userId}`);
+  const handleNavigation = (url) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate(url); 
+    } else {
+      Swal.fire({
+        title: "Access Denied",
+        text: "You need to log in to access this page.",
+        icon: "error",
+        confirmButtonText: "Okay"
+      });
+    }
   };
 
-  const handleDepositClick = (userId) => {
-    navigate(`/admin/deposit/user/${userId}`); // Navigate to deposit route
-  };
 
-  const handleWithdrawClick = (userId) => {
-    navigate(`/admin/withdraw/${userId}`); // Navigate to withdraw route
-  };
+
 
   return (
     <div className="p-8 w-full bg-white">
@@ -49,12 +81,12 @@ const UserList = () => {
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2 flex space-x-2">
                   <button 
-                    onClick={() => handleButtonClick(user.id)} 
+                    onClick={() => navigate(user.id)} 
                     className="px-4 py-2 bg-blue-500 text-white rounded"
                   >
                     View Transactions
                   </button>
-                  <button 
+                  {/* <button 
                     onClick={() => handleDepositClick(user.id)} 
                     className="px-4 py-2 bg-green-500 text-white rounded"
                   >
@@ -65,7 +97,7 @@ const UserList = () => {
                     className="px-4 py-2 bg-red-500 text-white rounded"
                   >
                     Withdraw
-                  </button>
+                  </button> */}
                 </td>
               </tr>
             ))}
