@@ -1,15 +1,22 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Componets/Sidebar'; // Ensure you're importing the Sidebar component
 import useTitle from '../../Componets/Hook/useTitle';
+import axios from 'axios';
 
 const TransactionList = () => {
-  useTitle("Tranactions of user");
-  const transactions = [
-    { id: 1, userId: 1, type: 'Deposit', amount: 500, date: '2023-10-01' },
-    { id: 2, userId: 1, type: 'Withdrawal', amount: 200, date: '2023-10-10' },
-    { id: 3, userId: 2, type: 'Deposit', amount: 800, date: '2023-10-02' },
-    { id: 4, userId: 3, type: 'Deposit', amount: 300, date: '2023-10-03' },
-  ];
+  useTitle("Transactions of user");
+
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    axios.get('https://api.example.com/transactions')
+      .then(response => {
+        setTransactions(response.data); 
+      })
+      .catch(error => {
+        console.error("There was an error fetching the transactions!", error);
+      });
+  }, []);
 
   return (
     <div className="flex">

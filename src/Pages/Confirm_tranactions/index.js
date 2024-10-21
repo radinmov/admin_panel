@@ -13,7 +13,7 @@ function ConfirmTransaction() {
         e.preventDefault();
         const data = {
             transaction_id: transactionId,
-            confirm: confirm, // boolean value
+            confirm: confirm,
         };
 
         try {

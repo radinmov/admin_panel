@@ -1,48 +1,26 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
+import axios from 'axios';
 
 const UserList = () => {
-  const users = [
-    { id: 1, name: 'Brooklyn Simmons', department: 'Software', phone: '000-000-0000', email: 'bsimmons@example.com' },
-    { id: 2, name: 'Aubrie Heuser', department: 'Product', phone: '000-000-0001', email: 'aheuser@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-    { id: 3, name: 'Leslie Alexander', department: 'Product', phone: '000-000-0002', email: 'lalexander@example.com' },
-  ];
-
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get('https://api.example.com/users')
+      .then(response => {
+        setUsers(response.data);
+      })
+      .catch(error => {
+        console.error("There was an error fetching the users!", error);
+      });
+  }, []);
 
   const handleNavigation = (url) => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate(url); 
+      navigate(url);
     } else {
       Swal.fire({
         title: "Access Denied",
@@ -52,9 +30,6 @@ const UserList = () => {
       });
     }
   };
-
-
-
 
   return (
     <div className="p-8 w-full bg-white">
@@ -81,23 +56,11 @@ const UserList = () => {
                 <td className="px-4 py-2">{user.email}</td>
                 <td className="px-4 py-2 flex space-x-2">
                   <button 
-                    onClick={() => navigate(user.id)} 
+                    onClick={() => navigate(`/user/${user.id}`)} 
                     className="px-4 py-2 bg-blue-500 text-white rounded"
                   >
                     View Transactions
                   </button>
-                  {/* <button 
-                    onClick={() => handleDepositClick(user.id)} 
-                    className="px-4 py-2 bg-green-500 text-white rounded"
-                  >
-                    Deposit
-                  </button>
-                  <button 
-                    onClick={() => handleWithdrawClick(user.id)} 
-                    className="px-4 py-2 bg-red-500 text-white rounded"
-                  >
-                    Withdraw
-                  </button> */}
                 </td>
               </tr>
             ))}
