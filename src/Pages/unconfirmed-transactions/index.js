@@ -1,19 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Sidebar from '../../Componets/Sidebar/index';
 import useTitle from '../../Componets/Hook/useTitle';
 
 const UnconfirmedTransactions = () => {
     useTitle("admin_Login");
-    const unconfirmedTransactions = [
-        { id: 1, userId: 1, amount: 100, date: '2024-10-10', status: 'Pending' },
-        { id: 2, userId: 2, amount: 200, date: '2024-10-11', status: 'Pending' },
-        { id: 3, userId: 3, amount: 150, date: '2024-10-12', status: 'Pending' },
-    ];
+    const [unconfirmedTransactions, setUnconfirmedTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // Fetch unconfirmed transactions from the API
+    useEffect(() => {
+        const fetchUnconfirmedTransactions = async () => {
+            try {
+                const response = await axios.get('https://1544-151-244-159-138.ngrok-free.app/api/v1/admin/unconfirmed-transactions');
+                setUnconfirmedTransactions(response.data.transactions); // Adjust based on the actual response structure
+                setLoading(false);
+            } catch (err) {
+                setError('Failed to fetch unconfirmed transactions');
+                setLoading(false);
+            }
+        };
+
+        fetchUnconfirmedTransactions();
+    }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
 
     return (
         <div className="flex">
             <Sidebar />
-
 
             <div className="flex-1 ml-64 p-8 bg-gray-100 min-h-screen">
                 <h1 className="text-2xl font-bold mb-4">Unconfirmed Transactions</h1>

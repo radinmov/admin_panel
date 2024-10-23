@@ -5,28 +5,28 @@ import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
     useTitle("admin_Login");
-    const [phone, setPhone] = useState("");
-    const navigate =useNavigate()
-    const [password, setpassword] = useState("");
+    const [username, setUsername] = useState(""); // Changed from phone to username
+    const navigate = useNavigate();
+    const [password, setPassword] = useState("");
 
     function handleLogin(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        if (!phone || !password) {
+        if (!username || !password) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "You must enter both phone number and password!",
+                text: "You must enter both username and password!",
             });
             return;
         }
 
         const data = JSON.stringify({
-            phone_number: phone,
-            verify_password: password,
+            username: username,
+            password: password, 
         });
 
-        fetch("/api/admin", {
+        fetch("https://1544-151-244-159-138.ngrok-free.app/api/v1/admin/login/", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -44,7 +44,7 @@ export default function Login() {
                         title: 'Success!',
                         text: 'Login successful!',
                     });
-                    navigate("/admin/home")
+                    navigate("/admin/home");
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -75,22 +75,24 @@ export default function Login() {
                     </div>
                     <form className="mt-8 space-y-4" onSubmit={handleLogin}>
                         <div>
-                            <label className="block text-gray-700">Your Phone Number</label>
+                            <label className="block text-gray-700">Your Username</label>
                             <input
-                                onChange={(e) => setPhone(e.target.value)}
+                                onChange={(e) => setUsername(e.target.value)}
                                 type="text"
-                                placeholder="Your phone number"
+                                placeholder="Your username"
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            <p>username</p>
                         </div>
                         <div>
-                            <label className="block text-gray-700">password</label>
+                            <label className="block text-gray-700">Password</label>
                             <input
-                                onChange={(e) => setpassword(e.target.value)}
-                                type="text"
+                                onChange={(e) => setPassword(e.target.value)}
+                                type="password" // Changed type to password for security
                                 placeholder="Your password"
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                            <p>password</p>
                         </div>
 
                         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm">
