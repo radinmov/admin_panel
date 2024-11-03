@@ -40,7 +40,7 @@ const UserList = () => {
             <tr className="bg-gray-100">
               <th className="px-4 py-2 text-left">ID</th>
               <th className="px-4 py-2 text-left">Name</th>
-              <th className="px-4 py-2 text-left">Department</th>
+              <th className="px-4 py-2 text-left">Active_user</th>
               <th className="px-4 py-2 text-left">Phone</th>
               <th className="px-4 py-2 text-left">Email</th>
               <th className="px-4 py-2 text-left">Actions</th>

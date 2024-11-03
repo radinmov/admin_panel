@@ -41,6 +41,14 @@ const Sidebar = () => {
           </li>
           <li className="mb-4">
             <button
+              onClick={() => handleNavigation("/admin/chat")}
+              className="hover:text-blue-500 font-bold"
+            >
+              Chat 
+            </button>
+          </li>
+          <li className="mb-4">
+            <button
               onClick={() => handleNavigation("/admin/unconfirmed-transactions")}
               className="hover:text-blue-500 font-bold"
             >

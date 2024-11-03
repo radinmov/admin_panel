@@ -5,6 +5,7 @@ import TransActions from "./Pages/transActions";
 import UnconfirmedTransactions from "./Pages/unconfirmed-transactions";
 import Settings from "./Pages/levels/index";
 import ConfirmTransaction from "./Pages/Confirm_tranactions/index";
+import { Chat } from "./Pages/Chat";
 
 const routes = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const routes = createBrowserRouter([
   {
     path: '/admin/settings',
     element: <Settings />
+  },
+  {
+    path: '/admin/chat',
+    element: <Chat />
   },
   {
     path: '/admin/confirm-transaction',
