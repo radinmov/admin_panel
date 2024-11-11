@@ -9,7 +9,6 @@ const UnconfirmedTransactions = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Fetch unconfirmed transactions from the API
     useEffect(() => {
         const fetchUnconfirmedTransactions = async () => {
             try {

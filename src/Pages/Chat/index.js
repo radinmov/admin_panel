@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const Chat = () => {
     const [selectedChat, setSelectedChat] = useState(null);
+    const [contacts, setContacts] = useState([]);
 
-    // List of contacts (example data)
-    const contacts = [
-        { id: 1, name: 'hidekimatsui', message: 'Can you help me?' },
-        { id: 2, name: 'dexterfowler', message: 'I’d like to...' },
-        { id: 3, name: 'stephenspeilborghs', message: 'How do I...?' },
-        { id: 4, name: 'dantebichette', message: 'My balance is too high' },
-        { id: 5, name: 'mattholliday', message: 'Nothing yet...' },
-    ];
+    // Fetch contacts from the API
+    useEffect(() => {
+        const fetchContacts = async () => {
+            try {
+                const response = await fetch('http://46.100.94.88:3003/admin/massages/');
+                const data = await response.json();
+                setContacts(data);
+            } catch (error) {
+                console.error('Error fetching contacts:', error);
+            }
+        };
+
+        fetchContacts();
+    }, []);
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -22,8 +29,10 @@ export const Chat = () => {
                     {contacts.map((contact) => (
                         <div 
                             key={contact.id} 
-                            onClick={() => setSelectedChat(contact)} // Set selected chat on click
-                            className={`flex items-center p-4 cursor-pointer ${selectedChat?.id === contact.id ? 'bg-gray-200' : 'hover:bg-gray-100'}`}
+                            onClick={() => setSelectedChat(contact)}
+                            className={`flex items-center p-4 cursor-pointer ${
+                                selectedChat?.id === contact.id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                            }`}
                         >
                             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                                 {contact.name[0].toUpperCase()}
