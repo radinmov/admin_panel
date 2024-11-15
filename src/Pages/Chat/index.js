@@ -8,7 +8,7 @@ export const Chat = () => {
     useEffect(() => {
         const fetchContacts = async () => {
             try {
-                const response = await fetch('http://46.100.94.88:3003/admin/massages/');
+                const response = await fetch('http://46.100.94.88:3003/api/v1/admin/massages/');
                 const data = await response.json();
                 setContacts(data);
             } catch (error) {
