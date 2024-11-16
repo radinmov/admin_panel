@@ -51,7 +51,7 @@ export default function Login() {
                     Swal.fire({
                         icon: "error",
                         title: "Oops...",
-                        text: `${result.message}`,
+                        text: `${result.msg}`,
                     });
                 }
             })

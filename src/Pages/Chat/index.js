@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export const Chat = () => {
     const [selectedChat, setSelectedChat] = useState(null);
     const [contacts, setContacts] = useState([]);
 
-    // Fetch contacts from the API
     useEffect(() => {
         const fetchContacts = async () => {
             try {
@@ -21,18 +21,16 @@ export const Chat = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            {/* Sidebar for chat list */}
             <div className="w-1/4 bg-white border-r border-gray-300 overflow-y-auto">
-                <div className="p-4 font-bold text-lg text-gray-700">Administrator</div>
+
+                <Link to={"/admin/home"}><div className="p-4 font-bold text-lg text-gray-700">Back to Home</div></Link>
                 <div className="space-y-2">
-                    {/* Chat contacts */}
                     {contacts.map((contact) => (
-                        <div 
-                            key={contact.id} 
+                        <div
+                            key={contact.id}
                             onClick={() => setSelectedChat(contact)}
-                            className={`flex items-center p-4 cursor-pointer ${
-                                selectedChat?.id === contact.id ? 'bg-gray-200' : 'hover:bg-gray-100'
-                            }`}
+                            className={`flex items-center p-4 cursor-pointer ${selectedChat?.id === contact.id ? 'bg-gray-200' : 'hover:bg-gray-100'
+                                }`}
                         >
                             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                                 {contact.name[0].toUpperCase()}
@@ -75,9 +73,9 @@ export const Chat = () => {
                 )}
                 {/* Message input */}
                 <div className="p-4 border-t border-gray-300 flex items-center">
-                    <input 
-                        type="text" 
-                        placeholder="Type your message" 
+                    <input
+                        type="text"
+                        placeholder="Type your message"
                         className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button className="ml-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600">

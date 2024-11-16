@@ -17,8 +17,26 @@ function Settings() {
             profit_multiplier: profitMultiplier,
         };
 
+        // Get token from localStorage
+        const token = localStorage.getItem("token");
+
+        // Check if token exists
+        if (!token) {
+            console.error("No token found. Please log in.");
+            return;
+        }
+
         try {
-            const response = await axios.post("your-backend-api-url/settings", data);
+            // Make the API request with the Authorization header
+            const response = await axios.post(
+                "http://46.100.94.88:3003/api/v1/admin/levels",
+                data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Include token here
+                    },
+                }
+            );
             console.log("Settings updated:", response.data);
         } catch (error) {
             console.error("Error updating settings:", error);

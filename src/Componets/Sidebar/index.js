@@ -41,6 +41,22 @@ const Sidebar = () => {
           </li>
           <li className="mb-4">
             <button
+              onClick={() => handleNavigation("/admin/Investemnt")}
+              className="hover:text-blue-500 font-bold"
+            >
+              Investemnt
+            </button>
+          </li>
+          <li className="mb-4">
+            <button
+              onClick={() => handleNavigation("/admin/Investemnt/update")}
+              className="hover:text-blue-500 font-bold"
+            >
+              update Investemnt
+            </button>
+          </li>
+          <li className="mb-4">
+            <button
               onClick={() => handleNavigation("/admin/chat")}
               className="hover:text-blue-500 font-bold"
             >

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../../Componets/Sidebar/index';
 import useTitle from '../../Componets/Hook/useTitle';
+import Swal from 'sweetalert2';
 
 const UnconfirmedTransactions = () => {
     useTitle("admin_Login");
@@ -12,8 +13,37 @@ const UnconfirmedTransactions = () => {
     useEffect(() => {
         const fetchUnconfirmedTransactions = async () => {
             try {
-                const response = await axios.get('https://1544-151-244-159-138.ngrok-free.app/api/v1/admin/unconfirmed-transactions');
-                setUnconfirmedTransactions(response.data.transactions); // Adjust based on the actual response structure
+                const token = localStorage.getItem('token');
+
+                if (!token) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Unauthorized',
+                        text: 'Please log in first.',
+                    });
+                    return;
+                }
+
+                const response = await axios.get('http://46.100.94.88:3003/api/v1/admin/unconfirmed-transactions', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                console.log("Full Response Data: ", response.data);
+                console.log("Transactions: ", response.data.transactions); // Check the transactions specifically
+
+                // Ensure 'transactions' is an array
+                const transactions = Array.isArray(response.data.unconfirmed_transactions) 
+                    ? response.data.unconfirmed_transactions 
+                    : [];
+
+                // Check if transactions are empty and log it
+                if (transactions.length === 0) {
+                    console.log("No unconfirmed transactions available.");
+                }
+
+                setUnconfirmedTransactions(transactions);
                 setLoading(false);
             } catch (err) {
                 setError('Failed to fetch unconfirmed transactions');
@@ -24,12 +54,18 @@ const UnconfirmedTransactions = () => {
         fetchUnconfirmedTransactions();
     }, []);
 
+    useEffect(() => {
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: `${error}`,
+            });
+        }
+    }, [error]);
+
     if (loading) {
         return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
     }
 
     return (
@@ -43,29 +79,32 @@ const UnconfirmedTransactions = () => {
                     <table className="min-w-full table-auto">
                         <thead>
                             <tr className="bg-gray-200">
-                                <th className="px-4 py-2 text-left">Transaction ID</th>
-                                <th className="px-4 py-2 text-left">User ID</th>
                                 <th className="px-4 py-2 text-left">Amount</th>
-                                <th className="px-4 py-2 text-left">Date</th>
-                                <th className="px-4 py-2 text-left">Status</th>
-                                <th className="px-4 py-2 text-left">Actions</th>
+                                <th className="px-4 py-2 text-left">Description</th>
+                                <th className="px-4 py-2 text-left">Request Date</th>
+                                <th className="px-4 py-2 text-left">Type</th>
+                                <th className="px-4 py-2 text-left">User ID</th>
+                                <th className="px-4 py-2 text-left">trans ID</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {unconfirmedTransactions.map((transaction) => (
-                                <tr key={transaction.id} className="border-b">
-                                    <td className="px-4 py-2">{transaction.id}</td>
-                                    <td className="px-4 py-2">{transaction.userId}</td>
-                                    <td className="px-4 py-2">${transaction.amount}</td>
-                                    <td className="px-4 py-2">{transaction.date}</td>
-                                    <td className="px-4 py-2">{transaction.status}</td>
-                                    <td className="px-4 py-2">
-                                        <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                            View Details
-                                        </button>
-                                    </td>
+                            {unconfirmedTransactions.length > 0 ? (
+                                unconfirmedTransactions.map((transaction) => (
+                                    <tr key={transaction.id} className="border-b">
+                                        <td className="px-4 py-2">{transaction.amount}T</td>
+                                        <td className="px-4 py-2">{transaction.description}</td>
+                                        <td className="px-4 py-2">{transaction.request_date}</td>
+                                        <td className="px-4 py-2">{transaction.type}</td> {/* Fixed field */}
+                                        <td className="px-4 py-2">{transaction.user_id}</td>
+                                        <td className="px-4 py-2">{transaction.id}</td>
+
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="px-4 py-2 text-center">No unconfirmed transactions found</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

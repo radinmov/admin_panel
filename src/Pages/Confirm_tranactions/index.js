@@ -8,16 +8,30 @@ function ConfirmTransaction() {
     const [confirm, setConfirm] = useState(false);
     useTitle("Confirm-transactions");
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         const data = {
             transaction_id: transactionId,
             confirm: confirm,
         };
 
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("No token found. Please log in.");
+            return;
+        }
+
         try {
-            const response = await axios.post("your-backend-api-url/confirm-transaction", data);
+            const response = await axios.post(
+                "http://46.100.94.88:3003/api/v1/admin/confirm-transaction",data,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, 
+                    },
+                }
+            );
             console.log("Transaction confirmed:", response.data);
         } catch (error) {
             console.error("Error confirming transaction:", error);
