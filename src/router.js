@@ -8,11 +8,16 @@ import ConfirmTransaction from "./Pages/Confirm_tranactions/index";
 import { Chat } from "./Pages/Chat";
 import { Investemnt } from "./Pages/Investemnt";
 import { UInvestment } from "./Pages/Investemnt_update";
+import { Register } from "./Pages/register";
 
 const routes = createBrowserRouter([
   {
     path: '/',
     element: <SignIn />
+  },
+  {
+    path: '/register',
+    element: <Register />
   },
   {
     path: '/admin/home',

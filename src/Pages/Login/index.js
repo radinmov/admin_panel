@@ -35,7 +35,9 @@ export default function Login() {
         })
             .then((response) => response.json())
             .then((result) => {
-                const token = result.token;
+                console.log(result);
+                
+                const token = result.access_token;
                 if (token) {
                     localStorage.setItem('token', token);
 

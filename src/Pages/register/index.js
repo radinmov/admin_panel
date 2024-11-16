@@ -29,6 +29,8 @@ export const Register = () => {
                 return response.json();
             })
             .then((result) => {
+                console.log(result);
+                
                 Swal.fire({
                     icon: "success",
                     title: "Success!",

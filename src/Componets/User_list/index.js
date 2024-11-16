@@ -8,8 +8,9 @@ const UserList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('https://api.example.com/users')
+    axios.get('http://46.100.94.88:3003/api/v1/admin/users')
       .then(response => {
+        console.log(response);
         setUsers(response.data);
       })
       .catch(error => {
