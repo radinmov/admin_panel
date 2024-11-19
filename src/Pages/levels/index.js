@@ -16,24 +16,19 @@ function Settings() {
             min_amount: minAmount,
             profit_multiplier: profitMultiplier,
         };
-
-        // Get token from localStorage
         const token = localStorage.getItem("token");
-
-        // Check if token exists
         if (!token) {
             console.error("No token found. Please log in.");
             return;
         }
 
         try {
-            // Make the API request with the Authorization header
             const response = await axios.post(
                 "http://46.100.94.88:3003/api/v1/admin/levels",
                 data,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`, // Include token here
+                        Authorization: `Bearer ${token}`,
                     },
                 }
             );

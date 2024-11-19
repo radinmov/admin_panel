@@ -31,14 +31,12 @@ const UnconfirmedTransactions = () => {
                 });
 
                 console.log("Full Response Data: ", response.data);
-                console.log("Transactions: ", response.data.transactions); // Check the transactions specifically
+                console.log("Transactions: ", response.data.transactions); 
 
-                // Ensure 'transactions' is an array
                 const transactions = Array.isArray(response.data.unconfirmed_transactions) 
                     ? response.data.unconfirmed_transactions 
                     : [];
 
-                // Check if transactions are empty and log it
                 if (transactions.length === 0) {
                     console.log("No unconfirmed transactions available.");
                 }

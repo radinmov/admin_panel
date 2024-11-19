@@ -9,7 +9,6 @@ const UserList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get the token from localStorage
     const token = localStorage.getItem("token");
 
     if (!token) {
@@ -24,7 +23,6 @@ const UserList = () => {
       return;
     }
 
-    // Fetch users from the backend with Bearer token
     axios
       .get('http://46.100.94.88:3003/api/v1/admin/users', {
         headers: {
@@ -32,15 +30,12 @@ const UserList = () => {
         },
       })
       .then((response) => {
-        console.log("Response Data:", response.data); // Debug the response
-
-        // Check if the response contains a list of users
         if (Array.isArray(response.data)) {
           setUsers(response.data);
         } else if (response.data && Array.isArray(response.data.users)) {
-          setUsers(response.data.users); // Adjust if data is nested
+          setUsers(response.data.users); 
         } else {
-          console.error("Unexpected response format:", response.data);
+          
         }
       })
       .catch((error) => {

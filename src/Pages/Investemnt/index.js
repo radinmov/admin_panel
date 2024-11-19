@@ -7,7 +7,7 @@ export const Investment = () => {
 
     useEffect(() => {
         const fetchInvestmentData = async () => {
-            const token = localStorage.getItem('token'); // Get token from localStorage
+            const token = localStorage.getItem('token'); 
             if (!token) {
                 Swal.fire({
                     icon: 'error',
@@ -18,11 +18,11 @@ export const Investment = () => {
             }
 
             try {
-                const response = await fetch('http://46.100.94.88:3003/api/v1/admin/invesment/', {
+                const response = await fetch('http://46.100.94.88:3003/api/v1/admin/invesment', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`, // Add Bearer token
+                        Authorization: `Bearer ${token}`,
                     },
                 });
 
