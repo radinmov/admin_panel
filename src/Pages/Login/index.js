@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import Swal from 'sweetalert2';
 import useTitle from '../../Componets/Hook/useTitle';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../../config';
 
 export default function Login() {
     useTitle("admin_Login");
@@ -26,7 +27,7 @@ export default function Login() {
             "password": password
         });
 
-        fetch("http://46.100.94.88:3003/api/v1/admin/login", {
+        fetch(`${BASE_URL}/api/v1/admin/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

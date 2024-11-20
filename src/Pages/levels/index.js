@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
+import { BASE_URL } from "../../config";
 
 function Settings() {
     const [minActiveUser, setMinActiveUser] = useState("");
@@ -12,7 +13,7 @@ function Settings() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const data = {
-            min_active_user: minActiveUser,
+            min_active_users: minActiveUser,
             min_amount: minAmount,
             profit_multiplier: profitMultiplier,
         };
@@ -24,7 +25,7 @@ function Settings() {
 
         try {
             const response = await axios.post(
-                "http://46.100.94.88:3003/api/v1/admin/levels",
+                `${BASE_URL}/api/v1/admin/levels`,
                 data,
                 {
                     headers: {

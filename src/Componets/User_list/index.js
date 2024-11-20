@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from "sweetalert2";
 import axios from 'axios';
+import { BASE_URL } from '../../config';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -24,7 +25,7 @@ const UserList = () => {
     }
 
     axios
-      .get('http://46.100.94.88:3003/api/v1/admin/users', {
+      .get(`${BASE_URL}/api/v1/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

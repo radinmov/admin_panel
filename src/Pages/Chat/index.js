@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { BASE_URL } from '../../config';
 
 export const Chat = () => {
-    const [selectedChat, setSelectedChat] = useState(null); 
-    const [messages, setMessages] = useState([]); 
-    const [isLoading, setIsLoading] = useState(true); 
-    const [error, setError] = useState(null); 
-    const token = localStorage.getItem('token');
+    const [selectedChat, setSelectedChat] = useState(null); // The currently selected chat
+    const [messages, setMessages] = useState([]); // All messages fetched from the API
+    const [newMessage, setNewMessage] = useState(''); // The new message to send
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [error, setError] = useState(null); // Error state
+    const token = localStorage.getItem('token'); // Token for authentication
+
     useEffect(() => {
         const fetchMessages = async () => {
             try {
                 setIsLoading(true); 
-                const response = await fetch('http://46.100.94.88:3003/api/v1/admin/messages', {
+                const response = await fetch(`${BASE_URL}/api/v1/admin/messages`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -33,6 +36,44 @@ export const Chat = () => {
 
         fetchMessages();
     }, []);
+
+    const handleSendMessage = async () => {
+        if (!newMessage.trim()) {
+            return; // Prevent sending empty messages
+        }
+
+        if (!selectedChat) {
+            return; // Prevent sending message if no chat is selected
+        }
+
+        try {
+            const userId = selectedChat.user_id; // Dynamically fetch user_id from selected chat
+
+            const response = await fetch(`${BASE_URL}/api/v1/messages/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ content: newMessage }), // Send message content
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to send message. Status: ${response.status}`);
+            }
+
+            const sentMessage = await response.json();
+
+            // Optionally, append the sent message to selectedChat or messages
+            setSelectedChat((prev) => ({
+                ...prev,
+                replies: [...(prev.replies || []), sentMessage], // Append the sent message to replies
+            }));
+            setNewMessage(''); // Clear the input field
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -77,7 +118,7 @@ export const Chat = () => {
                 {selectedChat ? (
                     <>
                         <div className="border-b border-gray-300 p-4 font-semibold text-gray-800">
-                            Chat with {selectedChat.username}
+                            Chat with {selectedChat.username} ({selectedChat.user_id})
                         </div>
                         <div className="flex-1 p-4 overflow-y-auto">
                             <div className="flex items-start mb-4">
@@ -93,6 +134,21 @@ export const Chat = () => {
                                     </p>
                                 </div>
                             </div>
+                            {selectedChat.replies?.map((reply, index) => (
+                                <div key={index} className="flex items-start mb-4">
+                                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
+                                        {reply.sender[0].toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-700 bg-gray-100 p-2 rounded-lg">
+                                            {reply.content}
+                                        </p>
+                                        <p className="text-sm text-gray-500 mt-1">
+                                            {new Date(reply.created_at).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </>
                 ) : (
@@ -104,10 +160,15 @@ export const Chat = () => {
                 <div className="p-4 border-t border-gray-300 flex items-center">
                     <input
                         type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your message"
                         className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <button className="ml-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600">
+                    <button
+                        onClick={handleSendMessage}
+                        className="ml-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600"
+                    >
                         Send
                     </button>
                 </div>

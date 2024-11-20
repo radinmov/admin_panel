@@ -2,6 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
+import { BASE_URL } from "../../config";
 
 function ConfirmTransaction() {
     const [transactionId, setTransactionId] = useState("");
@@ -25,7 +26,7 @@ function ConfirmTransaction() {
 
         try {
             const response = await axios.post(
-                "http://46.100.94.88:3003/api/v1/admin/confirm-transaction",data,
+                `${BASE_URL}/api/v1/admin/confirm-transaction`,data,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`, 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../config';
 
 export const Register = () => {
     const [username, setUsername] = useState("");
@@ -15,7 +16,7 @@ export const Register = () => {
             return;
         }
 
-        fetch("http://46.100.94.88:3003/api/v1/admin/register", {
+        fetch(`${BASE_URL}/api/v1/admin/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

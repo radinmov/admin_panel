@@ -7,7 +7,7 @@ export const Investment = () => {
 
     useEffect(() => {
         const fetchInvestmentData = async () => {
-            const token = localStorage.getItem('token'); 
+            const token = localStorage.getItem('token'); // Get the token from localStorage
             if (!token) {
                 Swal.fire({
                     icon: 'error',
@@ -18,7 +18,7 @@ export const Investment = () => {
             }
 
             try {
-                const response = await fetch('http://46.100.94.88:3003/api/v1/admin/invesment', {
+                const response = await fetch('https://08c3-202-43-6-53.ngrok-free.app/api/v1/admin/investments', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -26,14 +26,32 @@ export const Investment = () => {
                     },
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch investment data');
-                }
+                // Log the status and headers
+                console.log('Response Status:', response.status);
+                console.log('Response Headers:', response.headers);
 
-                const result = await response.json();
-                setData(result);
+                // Get the raw response text
+                const rawText = await response.text();
+                console.log('Raw Response:', rawText);
+
+                // Check if the Content-Type is JSON
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    const result = JSON.parse(rawText); // Parse JSON if the response is valid
+                    setData(result);
+                } else {
+                    throw new Error(`Unexpected response type: Expected JSON but got ${contentType}`);
+                }
             } catch (error) {
+                console.error('Fetch Error:', error.message);
                 setError(error.message);
+
+                // Show a user-friendly error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error fetching data',
+                    text: error.message,
+                });
             }
         };
 

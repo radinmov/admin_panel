@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Componets/Sidebar';
 import useTitle from '../../Componets/Hook/useTitle';
 import axios from 'axios';
+import { BASE_URL } from '../../config';
 
 const TransactionList = () => {
   useTitle("Transactions of user");
@@ -9,7 +10,7 @@ const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    axios.get('http://46.100.94.88:3003/api/v1/admin/transactions/')
+    axios.get(`${BASE_URL}/api/v1/admin/transactions/`)
       .then(response => {
         setTransactions(response.data); 
       })
