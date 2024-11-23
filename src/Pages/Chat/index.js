@@ -7,8 +7,8 @@ export const Chat = () => {
     const [messages, setMessages] = useState([]); // All messages fetched from the API
     const [newMessage, setNewMessage] = useState(''); // The new message to send
     const [isLoading, setIsLoading] = useState(true); // Loading state
-    const [error, setError] = useState(null); // Error state
-    const token = localStorage.getItem('token'); // Token for authentication
+    const [error, setError] = useState(null);
+    const token = localStorage.getItem('token'); 
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -17,6 +17,7 @@ export const Chat = () => {
                 const response = await fetch(`${BASE_URL}/api/v1/admin/messages`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     },
                 });
 
@@ -25,6 +26,8 @@ export const Chat = () => {
                 }
 
                 const data = await response.json();
+                console.log(data);
+                
                 setMessages(data.messages || []);
                 setError(null); 
             } catch (err) {
@@ -39,40 +42,35 @@ export const Chat = () => {
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) {
-            return; // Prevent sending empty messages
+            return;
         }
 
         if (!selectedChat) {
-            return; // Prevent sending message if no chat is selected
+            return;
         }
 
-        try {
-            const userId = selectedChat.user_id; // Dynamically fetch user_id from selected chat
 
-            const response = await fetch(`${BASE_URL}/api/v1/messages/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ content: newMessage }), // Send message content
-            });
 
-            if (!response.ok) {
-                throw new Error(`Failed to send message. Status: ${response.status}`);
-            }
 
-            const sentMessage = await response.json();
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", `Bearer ${token}`);
 
-            // Optionally, append the sent message to selectedChat or messages
-            setSelectedChat((prev) => ({
-                ...prev,
-                replies: [...(prev.replies || []), sentMessage], // Append the sent message to replies
-            }));
-            setNewMessage(''); // Clear the input field
-        } catch (err) {
-            setError(err.message);
-        }
+        const raw = JSON.stringify({
+        "content": newMessage
+        });
+
+        const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+        };
+
+        fetch("http://46.100.94.88:3003/api/v1/admin/messages/1", requestOptions)
+        .then((response) => response.text())
+        .then((result) => console.log(result))
+        .catch((error) => console.error(error));
     };
 
     return (

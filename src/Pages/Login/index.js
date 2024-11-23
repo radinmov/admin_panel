@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import Swal from 'sweetalert2';
 import useTitle from '../../Componets/Hook/useTitle';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../config';
 
 export default function Login() {
@@ -101,6 +101,7 @@ export default function Login() {
                         <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm">
                             Login
                         </button>
+                        <Link to={"/register"}>You don't have account ?</Link>
                     </form>
                 </div>
             </div>

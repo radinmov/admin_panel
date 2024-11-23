@@ -10,7 +10,7 @@ const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/v1/admin/transactions/`)
+    axios.get(`${BASE_URL}/api/v1/admin/transactions`)
       .then(response => {
         setTransactions(response.data); 
       })

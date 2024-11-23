@@ -6,7 +6,7 @@ import UnconfirmedTransactions from "./Pages/unconfirmed-transactions";
 import Settings from "./Pages/levels/index";
 import ConfirmTransaction from "./Pages/Confirm_tranactions/index";
 import { Chat } from "./Pages/Chat";
-import { Investment } from './Pages/Investemnt';
+import Investment from './Pages/Investemnt';
 import { UInvestment } from "./Pages/Investemnt_update";
 import { Register } from "./Pages/register";
 
@@ -22,6 +22,10 @@ const routes = createBrowserRouter([
   {
     path: '/admin/home',
     element: <Home />
+  },
+  {
+    path: '/admin/transactions',
+    element: <TransActions />
   },
   {
     path: '/admin/transactions/user/:userId',

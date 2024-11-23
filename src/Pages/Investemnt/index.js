@@ -1,76 +1,106 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { BASE_URL } from '../../config';
+import Sidebar from '../../Componets/Sidebar';
 
-export const Investment = () => {
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
+const Investment = () => {
+  const [investments, setInvestments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchInvestmentData = async () => {
-            const token = localStorage.getItem('token'); // Get the token from localStorage
-            if (!token) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Unauthorized',
-                    text: 'You need to log in to access this data.',
-                });
-                return;
-            }
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      Swal.fire({
+        title: 'Unauthorized',
+        text: 'You need to log in to access this page.',
+        icon: 'warning',
+        confirmButtonText: 'Log In',
+      }).then(() => {
+        navigate('/login');
+      });
+      return;
+    }
 
-            try {
-                const response = await fetch('https://08c3-202-43-6-53.ngrok-free.app/api/v1/admin/investments', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+    const fetchInvestments = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/v1/admin/investments`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-                // Log the status and headers
-                console.log('Response Status:', response.status);
-                console.log('Response Headers:', response.headers);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
 
-                // Get the raw response text
-                const rawText = await response.text();
-                console.log('Raw Response:', rawText);
+        const data = await response.json();
+        setInvestments(data.investments || []);
+      } catch (err) {
+        setError(err.message);
+        Swal.fire({
+          title: 'Error fetching data',
+          text: err.message,
+          icon: 'error',
+          confirmButtonText: 'Okay',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-                // Check if the Content-Type is JSON
-                const contentType = response.headers.get('Content-Type');
-                if (contentType && contentType.includes('application/json')) {
-                    const result = JSON.parse(rawText); // Parse JSON if the response is valid
-                    setData(result);
-                } else {
-                    throw new Error(`Unexpected response type: Expected JSON but got ${contentType}`);
-                }
-            } catch (error) {
-                console.error('Fetch Error:', error.message);
-                setError(error.message);
+    fetchInvestments();
+  }, [navigate]);
 
-                // Show a user-friendly error message
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error fetching data',
-                    text: error.message,
-                });
-            }
-        };
+  if (error) {
+    return <div className="text-red-500 text-center py-4">{error}</div>;
+  }
 
-        fetchInvestmentData();
-    }, []);
+  return (
+    <div className="flex h-screen ">
+      <Sidebar />
 
-    if (error) return <p className="text-red-500">Error: {error}</p>;
-    if (!data) return <p className="text-gray-600">Loading...</p>;
-
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">Investment Data</h2>
-                <div className="bg-gray-100 p-4 rounded-lg overflow-auto">
-                    <pre className="text-sm text-gray-700">
-                        {JSON.stringify(data, null, 2)}
-                    </pre>
-                </div>
-            </div>
-        </div>
-    );
+      <div className="flex-1 p-8 bg-white overflow-auto">
+        <h1 className="text-2xl font-bold mb-4">Investment List</h1>
+        {isLoading ? (
+          <div className="text-center">Loading...</div>
+        ) : investments.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border-collapse">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-4 py-2 text-left">ID</th>
+                  <th className="px-4 py-2 text-left">User ID</th>
+                  <th className="px-4 py-2 text-left">Amount</th>
+                  <th className="px-4 py-2 text-left">Cycle Length</th>
+                  <th className="px-4 py-2 text-left">Start Time</th>
+                  <th className="px-4 py-2 text-left">Withdrawable Profit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {investments.map((investment) => (
+                  <tr key={investment.id} className="border-b">
+                    <td className="px-4 py-2">{investment.id}</td>
+                    <td className="px-4 py-2">{investment.user_id}</td>
+                    <td className="px-4 py-2">{investment.amount}</td>
+                    <td className="px-4 py-2">{investment.cycle_length}</td>
+                    <td className="px-4 py-2">{new Date(investment.start_time).toLocaleString()}</td>
+                    <td className="px-4 py-2">{investment.withdrawable_profit}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center text-gray-600 py-4">No investments found.</div>
+        )}
+      </div>
+    </div>
+  );
 };
+
+export default Investment;
