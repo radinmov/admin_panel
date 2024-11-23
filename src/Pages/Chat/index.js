@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import { BASE_URL } from '../../config';
 
 export const Chat = () => {
@@ -8,16 +9,16 @@ export const Chat = () => {
     const [newMessage, setNewMessage] = useState(''); // The new message to send
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const [error, setError] = useState(null);
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
 
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                setIsLoading(true); 
+                setIsLoading(true);
                 const response = await fetch(`${BASE_URL}/api/v1/admin/messages`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json"
+                        'Content-Type': 'application/json',
                     },
                 });
 
@@ -26,14 +27,12 @@ export const Chat = () => {
                 }
 
                 const data = await response.json();
-                console.log(data);
-                
                 setMessages(data.messages || []);
-                setError(null); 
+                setError(null);
             } catch (err) {
                 setError(err.message);
             } finally {
-                setIsLoading(false); 
+                setIsLoading(false);
             }
         };
 
@@ -42,42 +41,66 @@ export const Chat = () => {
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Error',
+                text: 'Message content cannot be empty!',
+            });
             return;
         }
 
         if (!selectedChat) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Error',
+                text: 'Please select a chat to send the message!',
+            });
             return;
         }
 
-
-
-
         const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/json");
-        myHeaders.append("Authorization", `Bearer ${token}`);
+        myHeaders.append('Content-Type', 'application/json');
+        myHeaders.append('Authorization', `Bearer ${token}`);
 
         const raw = JSON.stringify({
-        "content": newMessage
+            content: newMessage,
         });
 
         const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
+            method: 'POST',
+            headers: myHeaders,
+            body: raw,
+            redirect: 'follow',
         };
 
-        fetch("http://46.100.94.88:3003/api/v1/admin/messages/1", requestOptions)
-        .then((response) => response.text())
-        .then((result) => console.log(result))
-        .catch((error) => console.error(error));
+        fetch(`${BASE_URL}/api/v1/admin/messages/1`, requestOptions)
+            .then((response) => response.json())
+            .then((result) => {
+                // Show success message with Swal2
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: result.message || 'Message sent successfully!',
+                });
+
+                // Optionally reset the newMessage field
+                setNewMessage('');
+            })
+            .catch((error) => {
+                // Show error message with Swal2
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Failed to send the message!',
+                });
+            });
     };
 
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
             <div className="w-1/4 bg-white border-r border-gray-300 overflow-y-auto">
-                <Link to={"/admin/home"}>
+                <Link to="/admin/home">
                     <div className="p-4 font-bold text-lg text-gray-700">Back to Home</div>
                 </Link>
                 <div className="space-y-2">
