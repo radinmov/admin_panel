@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Swal from 'sweetalert2';
-import { BASE_URL } from '../../config';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
+import { BASE_URL } from "../../config";
 
 export const Chat = () => {
     const [selectedChat, setSelectedChat] = useState(null); // The currently selected chat
     const [messages, setMessages] = useState([]); // All messages fetched from the API
-    const [newMessage, setNewMessage] = useState(''); // The new message to send
+    const [newMessage, setNewMessage] = useState(""); // The new message to send
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const [error, setError] = useState(null);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -18,7 +18,7 @@ export const Chat = () => {
                 const response = await fetch(`${BASE_URL}/api/v1/admin/messages`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
 
@@ -27,6 +27,8 @@ export const Chat = () => {
                 }
 
                 const data = await response.json();
+                console.log(data);
+
                 setMessages(data.messages || []);
                 setError(null);
             } catch (err) {
@@ -41,66 +43,113 @@ export const Chat = () => {
 
     const handleSendMessage = async () => {
         if (!newMessage.trim()) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Error',
-                text: 'Message content cannot be empty!',
-            });
-            return;
+            return; // Prevent sending empty messages
         }
 
         if (!selectedChat) {
             Swal.fire({
-                icon: 'warning',
-                title: 'Error',
-                text: 'Please select a chat to send the message!',
+                icon: "warning",
+                title: "No Chat Selected",
+                text: "Please select a chat before sending a message.",
             });
-            return;
+            return; // Ensure a chat is selected
         }
 
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/json');
-        myHeaders.append('Authorization', `Bearer ${token}`);
+        try {
+            const myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/json");
+            myHeaders.append("Authorization", `Bearer ${token}`);
 
-        const raw = JSON.stringify({
-            content: newMessage,
-        });
-
-        const requestOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: raw,
-            redirect: 'follow',
-        };
-
-        fetch(`${BASE_URL}/api/v1/admin/messages/1`, requestOptions)
-            .then((response) => response.json())
-            .then((result) => {
-                // Show success message with Swal2
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success',
-                    text: result.message || 'Message sent successfully!',
-                });
-
-                // Optionally reset the newMessage field
-                setNewMessage('');
-            })
-            .catch((error) => {
-                // Show error message with Swal2
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'Failed to send the message!',
-                });
+            const raw = JSON.stringify({
+                content: newMessage,
             });
+
+            const requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow",
+            };
+
+            const response = await fetch(
+                `${BASE_URL}/api/v1/admin/messages/${selectedChat.message_id}`,
+                requestOptions
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "An error occurred.");
+            }
+
+            const result = await response.json();
+
+            // Show SweetAlert2 popup with the message from the API response
+            Swal.fire({
+                icon: "success",
+                title: "Message Sent",
+                text: result.message || "Your message has been sent successfully!",
+            });
+
+            // Optionally clear the input field and reload the messages
+            setNewMessage("");
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        }
+    };
+
+    const handleDeleteChat = async (messageId) => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/v1/admin/messages/${messageId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "An error occurred while deleting the chat.");
+            }
+
+            const result = await response.json();
+            console.log(result);
+            
+
+            Swal.fire({
+                icon: "success",
+                title: "Chat Deleted",
+                text: result.message || "The chat has been deleted successfully!",
+            });
+
+            // Remove the deleted chat from the state
+            setMessages((prevMessages) =>
+                prevMessages.filter((message) => message.message_id !== messageId)
+            );
+
+            // If the deleted chat was selected, deselect it
+            if (selectedChat?.message_id === messageId) {
+                setSelectedChat(null);
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message || "Something went wrong. Please try again.",
+            });
+        }
     };
 
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
             <div className="w-1/4 bg-white border-r border-gray-300 overflow-y-auto">
-                <Link to="/admin/home">
+                <Link to={"/admin/home"}>
                     <div className="p-4 font-bold text-lg text-gray-700">Back to Home</div>
                 </Link>
                 <div className="space-y-2">
@@ -112,20 +161,34 @@ export const Chat = () => {
                         messages.map((message) => (
                             <div
                                 key={message.message_id}
-                                onClick={() => setSelectedChat(message)}
                                 className={`flex items-center p-4 cursor-pointer ${
                                     selectedChat?.message_id === message.message_id
-                                        ? 'bg-gray-200'
-                                        : 'hover:bg-gray-100'
+                                        ? "bg-gray-200"
+                                        : "hover:bg-gray-100"
                                 }`}
                             >
-                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
-                                    {message.username[0].toUpperCase()}
+                                <div
+                                    onClick={() => setSelectedChat(message)}
+                                    className="flex-1 flex items-center"
+                                >
+                                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
+                                        {message.username[0].toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <p className="text-gray-800 font-medium">
+                                            {message.username}
+                                        </p>
+                                        <p className="text-gray-500 text-sm truncate">
+                                            {message.content}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <p className="text-gray-800 font-medium">{message.username}</p>
-                                    <p className="text-gray-500 text-sm truncate">{message.content}</p>
-                                </div>
+                                <button
+                                    onClick={() => handleDeleteChat(message.message_id)}
+                                    className="ml-2 px-2 py-1 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
+                                >
+                                    Delete
+                                </button>
                             </div>
                         ))
                     ) : (

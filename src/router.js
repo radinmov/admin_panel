@@ -1,7 +1,6 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import UserTransactions from "./Pages/transActions/index";
 import SignIn from "./Pages/Login";
 import Home from "./Pages/HomePage";
-import TransActions from "./Pages/transActions";
 import UnconfirmedTransactions from "./Pages/unconfirmed-transactions";
 import Settings from "./Pages/levels/index";
 import ConfirmTransaction from "./Pages/Confirm_tranactions/index";
@@ -9,6 +8,7 @@ import { Chat } from "./Pages/Chat";
 import Investment from './Pages/Investemnt';
 import { UInvestment } from "./Pages/Investemnt_update";
 import { Register } from "./Pages/register";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 const routes = createBrowserRouter([
   {
@@ -24,12 +24,8 @@ const routes = createBrowserRouter([
     element: <Home />
   },
   {
-    path: '/admin/transactions',
-    element: <TransActions />
-  },
-  {
     path: '/admin/transactions/user/:userId',
-    element: <TransActions />
+    element: <UserTransactions />
   },
   {
     path: '/admin/unconfirmed-transactions',

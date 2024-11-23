@@ -28,6 +28,7 @@ const UserList = () => {
       .get(`${BASE_URL}/api/v1/admin/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
         },
       })
       .then((response) => {
@@ -96,7 +97,7 @@ const UserList = () => {
                   <td className="px-4 py-2">{user.total_profit_more_than_30_days}</td>
                   <td className="px-4 py-2 flex space-x-2">
                     <button
-                      onClick={() => handleNavigation(`/user/${user.id}`)}
+                      onClick={() => handleNavigation(`/admin/transactions/user/${user.id}`)}
                       className="px-4 py-2 bg-blue-500 text-white rounded"
                     >
                       View Transactions
