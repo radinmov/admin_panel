@@ -2,19 +2,21 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { BASE_URL } from '../../config';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../Componets/Sidebar';  // Import Sidebar
+import Sidebar from '../../Componets/Sidebar'; // Import Sidebar
+import useTitle from '../../Componets/Hook/useTitle';
 
 export const Register = () => {
+    useTitle("admin_register");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
     function handleRegister() {
-        if (!username || !password) {
+        if (!username.trim() || !password.trim()) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Please fill in both username and password!",
+                text: "Username and password cannot be empty!",
             });
             return;
         }
@@ -26,15 +28,17 @@ export const Register = () => {
             },
             body: JSON.stringify({ username, password }),
         })
-            .then((response) => {
+            .then(async (response) => {
                 if (!response.ok) {
+                    if (response.status === 422) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.message || "Invalid input data");
+                    }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then((result) => {
-                console.log(result);
-
                 if (result.access_token) {
                     localStorage.setItem('authToken', result.access_token);
 
@@ -57,7 +61,7 @@ export const Register = () => {
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: "Something went wrong. Please try again.",
+                    text: error.message || "Something went wrong. Please try again.",
                 });
             });
     }
@@ -66,8 +70,7 @@ export const Register = () => {
         <div className="flex">
             {/* Sidebar on the left */}
             <Sidebar />
-            {/* Main content on the right */}
-            <div className="min-h-screen flex items-center justify-center bg-gray-100 w-full ml-64"> {/* Adjust width */}
+            <div className="min-h-screen flex items-center justify-center bg-gray-100 w-full ml-64">
                 <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
                     <div className="p-8 bg-white flex flex-col justify-center">
                         <h2 className="text-2xl font-bold text-gray-700">
