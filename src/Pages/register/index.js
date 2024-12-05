@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { BASE_URL } from '../../config';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../../Componets/Sidebar'; // Import Sidebar
+import Sidebar from '../../Componets/Sidebar';
 import useTitle from '../../Componets/Hook/useTitle';
 
 export const Register = () => {
@@ -11,7 +11,7 @@ export const Register = () => {
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
 
-    function handleRegister() {
+    const handleRegister = async () => {
         if (!username.trim() || !password.trim()) {
             Swal.fire({
                 icon: "error",
@@ -21,54 +21,50 @@ export const Register = () => {
             return;
         }
 
-        fetch(`${BASE_URL}/api/v1/admin/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ username, password }),
-        })
-            .then(async (response) => {
-                if (!response.ok) {
-                    if (response.status === 422) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || "Invalid input data");
-                    }
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((result) => {
-                if (result.access_token) {
-                    localStorage.setItem('authToken', result.access_token);
+        try {
+            const response = await fetch(`${BASE_URL}/api/v1/admin/register`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ username, password }),
+            });
 
-                    Swal.fire({
-                        icon: "success",
-                        title: "Success!",
-                        text: result.message || "Registration successful!",
-                    });
-                    navigate('/');
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Error!",
-                        text: result.message || "Registration failed.",
-                    });
-                }
-            })
-            .catch((error) => {
-                console.error("Error:", error);
+            if (!response.ok) {
+                const errorData = await response.json();
+                const errorMessage = errorData.msg || `Error ${response.status}: Registration failed`;
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json();
+            if (result.access_token) {
+                localStorage.setItem('token', result.access_token);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Success!",
+                    text: result.message || "Registration successful!",
+                });
+                navigate('/admin/home');
+            } else {
                 Swal.fire({
                     icon: "error",
-                    title: "Oops...",
-                    text: error.message || "Something went wrong. Please try again.",
+                    title: "Error!",
+                    text: result.message || "Registration failed.",
                 });
+            }
+        } catch (error) {
+            console.error("Registration error:", error.message);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message || "Something went wrong. Please try again.",
             });
-    }
+        }
+    };
 
     return (
         <div className="flex">
-            {/* Sidebar on the left */}
             <Sidebar />
             <div className="min-h-screen flex items-center justify-center bg-gray-100 w-full ml-64">
                 <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">

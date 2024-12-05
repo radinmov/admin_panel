@@ -7,8 +7,8 @@ import ConfirmTransaction from "./Pages/Confirm_tranactions/index";
 import { Chat } from "./Pages/Chat";
 import Investment from './Pages/Investemnt';
 import { UInvestment } from "./Pages/Investemnt_update";
-import { Register } from "./Pages/register";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Register } from "./Pages/register";
 
 const routes = createBrowserRouter([
   {

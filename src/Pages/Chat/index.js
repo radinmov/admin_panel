@@ -2,16 +2,18 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../config";
+import useTitle from "../../Componets/Hook/useTitle";
 
 export const Chat = () => {
-    const [selectedChat, setSelectedChat] = useState(null); // The currently selected chat
-    const [messages, setMessages] = useState([]); // Merged messages grouped by user_id
-    const [newMessage, setNewMessage] = useState(""); // The new message to send
-    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [selectedChat, setSelectedChat] = useState(null); 
+    const [selectedMessage, setSelectedMessage] = useState(null); 
+    const [messages, setMessages] = useState([]); 
+    const [newMessage, setNewMessage] = useState(""); 
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const token = localStorage.getItem("token");
+    useTitle("admins_chat")
 
-    // Fetch messages on mount
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -36,7 +38,7 @@ export const Chat = () => {
                             acc[message.user_id] = {
                                 user_id: message.user_id,
                                 username: message.username,
-                                messages: [], // Initialize an array to hold all messages from this user
+                                messages: [],
                             };
                         }
                         acc[message.user_id].messages.push({
@@ -60,34 +62,33 @@ export const Chat = () => {
         fetchMessages();
     }, [token]);
 
-    // Handle sending a message
+    // Handle sending a message based on the selected message_id
     const handleSendMessage = async () => {
         if (!newMessage.trim()) {
             return; // Prevent sending an empty message
         }
 
-        if (!selectedChat) {
+        if (!selectedChat || !selectedMessage) {
             Swal.fire({
                 icon: "warning",
-                title: "No Chat Selected",
-                text: "Please select a chat before sending a message.",
+                title: "No Chat or Message Selected",
+                text: "Please select a chat and a specific message before sending a new message.",
             });
             return;
         }
 
         try {
-            // Show the loader using Swal
             Swal.fire({
                 title: "Sending Message...",
                 text: "Please wait while your message is being sent.",
                 allowOutsideClick: false,
                 didOpen: () => {
-                    Swal.showLoading(); // Activate the loading spinner
+                    Swal.showLoading();
                 },
             });
 
             const response = await fetch(
-                `${BASE_URL}/api/v1/admin/messages/${selectedChat.user_id}`,
+                `${BASE_URL}/api/v1/admin/messages/${selectedMessage.message_id}`,
                 {
                     method: "POST",
                     headers: {
@@ -105,7 +106,6 @@ export const Chat = () => {
 
             const result = await response.json();
 
-            // Hide the loader and show success message
             Swal.fire({
                 icon: "success",
                 title: "Message Sent",
@@ -118,7 +118,6 @@ export const Chat = () => {
         } catch (error) {
             console.error(error);
 
-            // Hide the loader and show error message
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -175,8 +174,16 @@ export const Chat = () => {
                             Chat with {selectedChat.username} ({selectedChat.user_id})
                         </div>
                         <div className="flex-1 p-4 overflow-y-auto">
-                            {selectedChat.messages.map((msg, index) => (
-                                <div key={msg.message_id || index} className="flex items-start mb-4">
+                            {selectedChat.messages.map((msg) => (
+                                <div
+                                    key={msg.message_id}
+                                    className={`flex items-start mb-4 cursor-pointer ${
+                                        selectedMessage?.message_id === msg.message_id
+                                            ? "bg-gray-200"
+                                            : ""
+                                    }`}
+                                    onClick={() => setSelectedMessage(msg)}
+                                >
                                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                                         {selectedChat.username[0].toUpperCase()}
                                     </div>
