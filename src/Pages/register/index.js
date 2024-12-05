@@ -21,6 +21,24 @@ export const Register = () => {
             return;
         }
 
+        if (username.length < 2) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Username",
+                text: "Username must be at least 2 characters long.",
+            });
+            return;
+        }
+
+        if (password.length < 6) {
+            Swal.fire({
+                icon: "error",
+                title: "Invalid Password",
+                text: "Password must be at least 6 characters long.",
+            });
+            return;
+        }
+
         try {
             const response = await fetch(`${BASE_URL}/api/v1/admin/register`, {
                 method: "POST",
@@ -32,8 +50,7 @@ export const Register = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                const errorMessage = errorData.msg || `Error ${response.status}: Registration failed`;
-                throw new Error(errorMessage);
+                throw new Error(errorData.msg || "Registration failed.");
             }
 
             const result = await response.json();
@@ -43,18 +60,11 @@ export const Register = () => {
                 Swal.fire({
                     icon: "success",
                     title: "Success!",
-                    text: result.message || "Registration successful!",
+                    text: "Registration successful!",
                 });
                 navigate('/admin/home');
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error!",
-                    text: result.message || "Registration failed.",
-                });
             }
         } catch (error) {
-            console.error("Registration error:", error.message);
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -72,11 +82,6 @@ export const Register = () => {
                         <h2 className="text-2xl font-bold text-gray-700">
                             Register a New Admin Account
                         </h2>
-                        <div className="mt-4 flex items-center justify-between">
-                            <span className="border-b w-1/5 lg:w-1/4"></span>
-                            <span className="text-xs text-center text-gray-500 uppercase">here</span>
-                            <span className="border-b w-1/5 lg:w-1/4"></span>
-                        </div>
                         <div className="mt-8 space-y-4">
                             <div>
                                 <label className="block text-gray-700">Your Username</label>
