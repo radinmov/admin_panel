@@ -31,10 +31,10 @@ const UnconfirmedTransactions = () => {
                 });
 
                 console.log("Full Response Data: ", response.data);
-                console.log("Transactions: ", response.data.transactions); 
+                console.log("Transactions: ", response.data.transactions);
 
-                const transactions = Array.isArray(response.data.unconfirmed_transactions) 
-                    ? response.data.unconfirmed_transactions 
+                const transactions = Array.isArray(response.data.unconfirmed_transactions)
+                    ? response.data.unconfirmed_transactions
                     : [];
 
                 if (transactions.length === 0) {
@@ -63,7 +63,10 @@ const UnconfirmedTransactions = () => {
     }, [error]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="flex justify-center items-center h-screen bg-gray-100">
+            <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+            <p className="ml-4 text-blue-600 text-lg">Loading unconfirmed transactions...</p>
+        </div>;
     }
 
     return (

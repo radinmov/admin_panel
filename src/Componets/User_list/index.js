@@ -35,9 +35,9 @@ const UserList = () => {
         if (Array.isArray(response.data)) {
           setUsers(response.data);
         } else if (response.data && Array.isArray(response.data.users)) {
-          setUsers(response.data.users); 
+          setUsers(response.data.users);
         } else {
-          
+
         }
       })
       .catch((error) => {
@@ -72,7 +72,10 @@ const UserList = () => {
     <div className="p-8 w-full bg-white">
       <h1 className="text-2xl font-bold mb-4">User List</h1>
       {isLoading ? (
-        <div className="text-center">Loading...</div>
+        <div className="flex justify-center items-center h-screen ">
+          <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+          <p className="ml-4 text-blue-600 text-lg">Loading transactions...</p>
+        </div>
       ) : users.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto">

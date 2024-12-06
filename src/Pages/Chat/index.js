@@ -5,10 +5,10 @@ import { BASE_URL } from "../../config";
 import useTitle from "../../Componets/Hook/useTitle";
 
 export const Chat = () => {
-    const [selectedChat, setSelectedChat] = useState(null); 
-    const [selectedMessage, setSelectedMessage] = useState(null); 
-    const [messages, setMessages] = useState([]); 
-    const [newMessage, setNewMessage] = useState(""); 
+    const [selectedChat, setSelectedChat] = useState(null);
+    const [selectedMessage, setSelectedMessage] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const token = localStorage.getItem("token");
@@ -135,18 +135,20 @@ export const Chat = () => {
                 </Link>
                 <div className="space-y-2">
                     {isLoading ? (
-                        <div className="p-4 text-gray-500">Loading messages...</div>
+                        <div className="flex justify-center items-center h-screen ">
+                            <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
+                            <p className="ml-4 text-blue-600 text-lg">Loading Chats...</p>
+                        </div>
                     ) : error ? (
                         <div className="p-4 text-red-500">Error: {error}</div>
                     ) : messages.length > 0 ? (
                         messages.map((chat) => (
                             <div
                                 key={chat.user_id}
-                                className={`flex items-center p-4 cursor-pointer ${
-                                    selectedChat?.user_id === chat.user_id
+                                className={`flex items-center p-4 cursor-pointer ${selectedChat?.user_id === chat.user_id
                                         ? "bg-gray-200"
                                         : "hover:bg-gray-100"
-                                }`}
+                                    }`}
                                 onClick={() => setSelectedChat(chat)}
                             >
                                 <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
@@ -177,11 +179,10 @@ export const Chat = () => {
                             {selectedChat.messages.map((msg) => (
                                 <div
                                     key={msg.message_id}
-                                    className={`flex items-start mb-4 cursor-pointer ${
-                                        selectedMessage?.message_id === msg.message_id
+                                    className={`flex items-start mb-4 cursor-pointer ${selectedMessage?.message_id === msg.message_id
                                             ? "bg-gray-200"
                                             : ""
-                                    }`}
+                                        }`}
                                     onClick={() => setSelectedMessage(msg)}
                                 >
                                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
