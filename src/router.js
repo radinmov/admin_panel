@@ -32,6 +32,10 @@ const routes = createBrowserRouter([
     element: <UnconfirmedTransactions />
   },
   {
+    path: '/admin/confirm-transaction/:transactionId',
+    element: <ConfirmTransaction />
+},
+  {
     path: '/admin/Investemnt',
     element: <Investment />
   },

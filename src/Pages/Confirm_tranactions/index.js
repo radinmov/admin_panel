@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
@@ -6,23 +7,14 @@ import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
 
 function ConfirmTransaction() {
-    const [transactionId, setTransactionId] = useState("");
+    const { transactionId } = useParams(); // Retrieve transaction ID from the URL
     const [confirm, setConfirm] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // Track loading state
+    const [isLoading, setIsLoading] = useState(false);
+
     useTitle("Confirm-transactions");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Input validation
-        if (!transactionId.trim() || !confirm) {
-            Swal.fire({
-                icon: "warning",
-                title: "Missing Information",
-                text: "Please fill in the transaction ID and confirm the transaction before submitting.",
-            });
-            return;
-        }
 
         const data = {
             transaction_id: transactionId,
@@ -41,7 +33,7 @@ function ConfirmTransaction() {
         }
 
         try {
-            setIsLoading(true); // Start loading state
+            setIsLoading(true);
             Swal.fire({
                 title: "Processing Transaction...",
                 text: "Please wait while the transaction is being confirmed.",
@@ -61,11 +53,10 @@ function ConfirmTransaction() {
 
             Swal.fire({
                 icon: "success",
-                title: "Transaction Confirmed",
+                title: "Transaction",
                 text: response.data?.message || "The transaction was successfully confirmed.",
             });
 
-            setTransactionId(""); 
             setConfirm(false); 
         } catch (error) {
             Swal.fire({
@@ -74,14 +65,7 @@ function ConfirmTransaction() {
                 text: error.response?.data?.message || "Failed to confirm the transaction. Please try again.",
             });
         } finally {
-            setIsLoading(false); 
-        }
-    };
-
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            handleSubmit(e);
+            setIsLoading(false);
         }
     };
 
@@ -93,7 +77,6 @@ function ConfirmTransaction() {
                     <h2 className="text-2xl font-semibold text-center mb-6">
                         Confirm Transaction
                     </h2>
-
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm mb-2">
@@ -101,11 +84,9 @@ function ConfirmTransaction() {
                             </label>
                             <input
                                 type="text"
-                                value={transactionId}
-                                onChange={(e) => setTransactionId(e.target.value)}
-                                onKeyDown={handleKeyDown} // Handle Enter key
+                                value={transactionId} // Prefilled from URL
+                                readOnly // Make it read-only
                                 className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Enter transaction ID"
                             />
                         </div>
 
@@ -123,7 +104,7 @@ function ConfirmTransaction() {
 
                         <button
                             type="submit"
-                            disabled={isLoading} // Disable button during loading
+                            disabled={isLoading}
                             className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
                                 isLoading ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-600"
                             }`}

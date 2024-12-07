@@ -82,6 +82,7 @@ const UserList = () => {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2 text-left">ID</th>
+                <th className="px-4 py-2 text-left">Username</th>
                 <th className="px-4 py-2 text-left">referral_bonus</th>
                 <th className="px-4 py-2 text-left">referral_code</th>
                 <th className="px-4 py-2 text-left">total_amount_invested</th>
@@ -93,6 +94,7 @@ const UserList = () => {
               {users.map((user) => (
                 <tr key={user.id} className="border-b">
                   <td className="px-4 py-2">{user.id}</td>
+                  <td className="px-4 py-2">{user.username}</td>
                   <td className="px-4 py-2">{user.referral_bonus}</td>
                   <td className="px-4 py-2">{user.referral_code}</td>
                   <td className="px-4 py-2">{user.total_amount_invested}</td>

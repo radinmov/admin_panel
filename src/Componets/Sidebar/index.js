@@ -33,14 +33,6 @@ const Sidebar = () => {
           </li>
           <li className="mb-4">
             <button
-              onClick={() => navigate('/register')}
-              className="hover:text-blue-500 font-bold"
-            >
-              register
-            </button>
-          </li>
-          <li className="mb-4">
-            <button
               onClick={() => handleNavigation("/admin/home")}
               className="hover:text-blue-500 font-bold"
             >

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../../Componets/Sidebar/index';
 import useTitle from '../../Componets/Hook/useTitle';
@@ -6,6 +7,7 @@ import Swal from 'sweetalert2';
 
 const UnconfirmedTransactions = () => {
     useTitle("admin_Login");
+    const navigate = useNavigate();
     const [unconfirmedTransactions, setUnconfirmedTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -30,16 +32,9 @@ const UnconfirmedTransactions = () => {
                     },
                 });
 
-                console.log("Full Response Data: ", response.data);
-                console.log("Transactions: ", response.data.transactions);
-
                 const transactions = Array.isArray(response.data.unconfirmed_transactions)
                     ? response.data.unconfirmed_transactions
                     : [];
-
-                if (transactions.length === 0) {
-                    console.log("No unconfirmed transactions available.");
-                }
 
                 setUnconfirmedTransactions(transactions);
                 setLoading(false);
@@ -85,7 +80,8 @@ const UnconfirmedTransactions = () => {
                                 <th className="px-4 py-2 text-left">Request Date</th>
                                 <th className="px-4 py-2 text-left">Type</th>
                                 <th className="px-4 py-2 text-left">User ID</th>
-                                <th className="px-4 py-2 text-left">trans ID</th>
+                                <th className="px-4 py-2 text-left">Transaction ID</th>
+                                <th className="px-4 py-2 text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,15 +91,22 @@ const UnconfirmedTransactions = () => {
                                         <td className="px-4 py-2">{transaction.amount}T</td>
                                         <td className="px-4 py-2">{transaction.description}</td>
                                         <td className="px-4 py-2">{transaction.request_date}</td>
-                                        <td className="px-4 py-2">{transaction.type}</td> {/* Fixed field */}
+                                        <td className="px-4 py-2">{transaction.type}</td>
                                         <td className="px-4 py-2">{transaction.user_id}</td>
                                         <td className="px-4 py-2">{transaction.id}</td>
-
+                                        <td className="px-4 py-2">
+                                            <button
+                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                                onClick={() => navigate(`/admin/confirm-transaction/${transaction.id}`)}
+                                            >
+                                                Confirm
+                                            </button>
+                                        </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="6" className="px-4 py-2 text-center">No unconfirmed transactions found</td>
+                                    <td colSpan="7" className="px-4 py-2 text-center">No unconfirmed transactions found</td>
                                 </tr>
                             )}
                         </tbody>
