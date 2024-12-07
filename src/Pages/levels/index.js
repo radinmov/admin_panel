@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
@@ -9,10 +9,52 @@ function Settings() {
     const [minActiveUser, setMinActiveUser] = useState("");
     const [minAmount, setMinAmount] = useState("");
     const [profitMultiplier, setProfitMultiplier] = useState("");
-    const [isLoading, setIsLoading] = useState(false); // Track loading state
+    const [isLoading, setIsLoading] = useState(false);
+    const [levels, setLevels] = useState([]);
     useTitle("admin_setting");
 
-    const handleSubmit = async (e) => {
+    // Fetch levels from API on component mount
+    useEffect(() => {
+        const fetchLevels = async () => {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Authentication Error",
+                    text: "No token found. Please log in.",
+                });
+                return;
+            }
+
+            try {
+                const response = await axios.get(`${BASE_URL}/api/v1/admin/levels`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                if (response.data) {
+                    setLevels(response.data); 
+                } else {
+                    Swal.fire({
+                        icon: "info",
+                        title: "No Levels Found",
+                        text: "There are no levels available.",
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: error.response?.data?.message || "Failed to fetch levels. Please try again.",
+                });
+            }
+        };
+
+        fetchLevels();
+    }, []);
+
+    // Handle level update submission
+    const handleLevelSubmit = async (e) => {
         e.preventDefault();
         const data = {
             min_active_users: minActiveUser,
@@ -30,9 +72,9 @@ function Settings() {
         }
 
         try {
-            setIsLoading(true); // Start loading state
+            setIsLoading(true);
             Swal.fire({
-                title: "Saving Settings...",
+                title: "Saving Level Settings...",
                 text: "Please wait while your settings are being updated.",
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading(),
@@ -72,26 +114,26 @@ function Settings() {
         }
     };
 
-    // Handle pressing Enter to submit the form
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
-            handleSubmit(e);
+            handleLevelSubmit(e);
         }
     };
 
     return (
         <>
             <Sidebar />
-            <div className="h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white shadow-lg rounded-lg p-8">
-                    <h2 className="text-2xl font-semibold text-center mb-6">
+            <div className="h-screen flex items-center justify-center bg-black">
+                <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-96">
+                    <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
                         Admin Settings
                     </h2>
 
-                    <form onSubmit={handleSubmit}>
+                    {/* Form for Managing Levels */}
+                    <form onSubmit={handleLevelSubmit}>
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm mb-2">
+                            <label className="block text-gray-300 text-sm mb-2">
                                 Min Active User
                             </label>
                             <input
@@ -99,29 +141,29 @@ function Settings() {
                                 value={minActiveUser}
                                 onChange={(e) => setMinActiveUser(e.target.value)}
                                 onKeyDown={handleKeyDown} // Handle Enter key
-                                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
                                 placeholder="Enter minimum active users"
                                 required
                             />
                         </div>
 
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm mb-2">
+                            <label className="block text-gray-300 text-sm mb-2">
                                 Min Amount
                             </label>
                             <input
                                 type="number"
                                 value={minAmount}
                                 onChange={(e) => setMinAmount(e.target.value)}
-                                onKeyDown={handleKeyDown} // Handle Enter key
-                                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onKeyDown={handleKeyDown} 
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
                                 placeholder="Enter minimum amount"
                                 required
                             />
                         </div>
 
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm mb-2">
+                            <label className="block text-gray-300 text-sm mb-2">
                                 Profit Multiplier
                             </label>
                             <input
@@ -129,8 +171,8 @@ function Settings() {
                                 step="0.01"
                                 value={profitMultiplier}
                                 onChange={(e) => setProfitMultiplier(e.target.value)}
-                                onKeyDown={handleKeyDown} // Handle Enter key
-                                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onKeyDown={handleKeyDown}
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
                                 placeholder="Enter profit multiplier"
                                 required
                             />
@@ -138,14 +180,26 @@ function Settings() {
 
                         <button
                             type="submit"
-                            disabled={isLoading} // Disable button during loading
+                            disabled={isLoading} 
                             className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
-                                isLoading ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-600"
+                                isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
                             }`}
                         >
-                            {isLoading ? "Saving..." : "Save Settings"}
+                            {isLoading ? "Saving..." : "Save Level Settings"}
                         </button>
                     </form>
+
+                    {/* Display Levels Information */}
+                    {levels.length > 0 && (
+                        <div className="mt-6">
+                            <h3 className="text-xl text-green-500">Current Level Information</h3>
+                            <div className="text-gray-300">
+                                <p>Min Active Users: {levels[0].min_active_users}</p>
+                                <p>Min Amount: ${levels[0].min_amount}</p>
+                                <p>Profit Multiplier: {levels[0].profit_multiplier}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

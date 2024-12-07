@@ -1,12 +1,12 @@
-
 const Card = ({ title, balance, bgColor }) => {
-    return (
-      <div className={`p-6 rounded-lg shadow-lg text-white ${bgColor}`}>
-        <h2 className="text-lg">{title}</h2>
-        <p className="text-3xl font-bold">{balance}</p>
-      </div>
-    );
-  }
-  
-  export default Card;
-  
+  return (
+    <div
+      className={`rounded-lg shadow-lg p-6 text-white ${bgColor} transform transition-transform hover:scale-105`}
+    >
+      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+      <p className="text-2xl font-bold">{balance}</p>
+    </div>
+  );
+};
+
+export default Card;

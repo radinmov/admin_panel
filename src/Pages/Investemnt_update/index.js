@@ -5,11 +5,10 @@ import Sidebar from "../../Componets/Sidebar";
 export const UInvestment = () => {
     const [investmentId, setInvestmentId] = useState("");
     const [amount, setAmount] = useState("");
-    const [updateMessage, setUpdateMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-        setUpdateMessage("");
 
         const token = localStorage.getItem("token");
         if (!token) {
@@ -22,12 +21,7 @@ export const UInvestment = () => {
         }
 
         try {
-            Swal.fire({
-                title: "Updating Investment...",
-                text: "Please wait while the update is being processed.",
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading(),
-            });
+            setLoading(true);
 
             const response = await fetch(
                 "http://46.100.94.88:3003/api/v1/admin/investment/update",
@@ -55,63 +49,58 @@ export const UInvestment = () => {
                 title: "Success",
                 text: result.msg || "Investment updated successfully!",
             });
+
+            setInvestmentId("");
+            setAmount("");
         } catch (error) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
                 text: error.message || "Failed to update investment. Please try again.",
             });
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <>
             <Sidebar />
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
-                    <div className="p-8 bg-white flex flex-col justify-center">
-                        <h2 className="text-2xl font-bold text-gray-700">Update Investment</h2>
-                        <div className="mt-4 flex items-center justify-between">
-                            <span className="border-b w-1/5 lg:w-1/4"></span>
-                            <span className="text-xs text-center text-gray-500 uppercase">
-                                Update Details
-                            </span>
-                            <span className="border-b w-1/5 lg:w-1/4"></span>
-                        </div>
-                        <form className="mt-8 space-y-4" onSubmit={handleUpdate}>
+            <div className="min-h-screen flex items-center justify-center bg-black">
+                <div className="flex flex-col md:flex-row bg-black border border-lime-400 shadow-lg rounded-lg overflow-hidden p-8">
+                    <div className="p-6">
+                        <h2 className="text-3xl font-bold text-lime-400 mb-6 text-center">Update Investment</h2>
+                        <form className="space-y-6" onSubmit={handleUpdate}>
                             <div>
-                                <label className="block text-gray-700">Investment ID</label>
+                                <label className="block text-lime-400">Investment ID</label>
                                 <input
                                     onChange={(e) => setInvestmentId(e.target.value)}
                                     type="text"
                                     placeholder="Enter Investment ID"
                                     value={investmentId}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 bg-black text-lime-400 border border-lime-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-400"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700">Amount</label>
+                                <label className="block text-lime-400">Amount</label>
                                 <input
                                     onChange={(e) => setAmount(e.target.value)}
                                     type="number"
                                     placeholder="Enter Amount"
                                     value={amount}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 bg-black text-lime-400 border border-lime-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-lime-400"
                                 />
                             </div>
-
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm"
+                                className={`w-full py-2 rounded-lg text-black font-bold bg-lime-400 hover:bg-lime-500 transition ${
+                                    loading ? "opacity-50 cursor-not-allowed" : ""
+                                }`}
+                                disabled={loading}
                             >
-                                Update Investment
+                                {loading ? "Updating..." : "Update Investment"}
                             </button>
                         </form>
-                        {updateMessage && (
-                            <p className="mt-4 text-sm text-center text-gray-600">
-                                {updateMessage}
-                            </p>
-                        )}
                     </div>
                 </div>
             </div>

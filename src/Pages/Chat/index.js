@@ -12,7 +12,7 @@ export const Chat = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const token = localStorage.getItem("token");
-    useTitle("admins_chat")
+    useTitle("Admin Chat");
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -31,7 +31,6 @@ export const Chat = () => {
 
                 const data = await response.json();
 
-                // Merge messages with the same user_id
                 const mergedMessages = Object.values(
                     data.messages.reduce((acc, message) => {
                         if (!acc[message.user_id]) {
@@ -62,10 +61,15 @@ export const Chat = () => {
         fetchMessages();
     }, [token]);
 
-    // Handle sending a message based on the selected message_id
     const handleSendMessage = async () => {
         if (!newMessage.trim()) {
-            return; // Prevent sending an empty message
+            Swal.fire({
+                icon: "warning",
+                title: "Empty Message",
+                text: "You cannot send an empty message. Please type something!",
+                showConfirmButton: true,
+            });
+            return;
         }
 
         if (!selectedChat || !selectedMessage) {
@@ -73,6 +77,8 @@ export const Chat = () => {
                 icon: "warning",
                 title: "No Chat or Message Selected",
                 text: "Please select a chat and a specific message before sending a new message.",
+                showConfirmButton: true,
+                allowOutsideClick: false,
             });
             return;
         }
@@ -82,9 +88,7 @@ export const Chat = () => {
                 title: "Sending Message...",
                 text: "Please wait while your message is being sent.",
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
+                didOpen: () => Swal.showLoading(),
             });
 
             const response = await fetch(
@@ -111,13 +115,9 @@ export const Chat = () => {
                 title: "Message Sent",
                 text: result.message || "Your message has been sent successfully!",
             }).then(() => {
-                // Refresh the page after the success message
                 window.location.reload();
             });
-
         } catch (error) {
-            console.error(error);
-
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -127,69 +127,73 @@ export const Chat = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100">
+        <div className="flex h-screen bg-gray-50">
             {/* Sidebar */}
-            <div className="w-1/4 bg-white border-r border-gray-300 overflow-y-auto">
-                <Link to={"/admin/home"}>
-                    <div className="p-4 font-bold text-lg text-gray-700">Back to Home</div>
+            <div className="w-1/3 bg-gray-900 text-gray-200 border-r border-gray-800 overflow-y-auto">
+                <Link to="/admin/home">
+                    <div className="p-4 text-lg font-bold text-center hover:bg-gray-800 transition">
+                        Back to Home
+                    </div>
                 </Link>
-                <div className="space-y-2">
+                <div className="space-y-4">
                     {isLoading ? (
-                        <div className="flex justify-center items-center h-screen ">
-                            <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
-                            <p className="ml-4 text-blue-600 text-lg">Loading Chats...</p>
+                        <div className="flex justify-center items-center h-full">
+                            <div className="w-12 h-12 border-4 border-green-500 border-dotted rounded-full animate-spin"></div>
+                            <p className="ml-4 text-green-400 text-lg">Loading Chats...</p>
                         </div>
                     ) : error ? (
-                        <div className="p-4 text-red-500">Error: {error}</div>
+                        <div className="p-4 text-red-500 text-center">Error: {error}</div>
                     ) : messages.length > 0 ? (
                         messages.map((chat) => (
                             <div
                                 key={chat.user_id}
-                                className={`flex items-center p-4 cursor-pointer ${selectedChat?.user_id === chat.user_id
-                                        ? "bg-gray-200"
-                                        : "hover:bg-gray-100"
-                                    }`}
+                                className={`flex items-center p-4 cursor-pointer rounded-lg transition ${
+                                    selectedChat?.user_id === chat.user_id
+                                        ? "bg-gray-700"
+                                        : "hover:bg-gray-800"
+                                }`}
                                 onClick={() => setSelectedChat(chat)}
                             >
-                                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
+                                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                                     {chat.username[0].toUpperCase()}
                                 </div>
                                 <div>
-                                    <p className="text-gray-800 font-medium">{chat.username}</p>
-                                    <p className="text-gray-500 text-sm truncate">
+                                    <p className="font-medium">{chat.username}</p>
+                                    <p className="text-gray-400 text-sm truncate">
                                         {chat.messages[chat.messages.length - 1]?.content}
                                     </p>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="p-4 text-gray-500">No messages available.</div>
+                        <div className="p-4 text-gray-500 text-center">No messages available.</div>
                     )}
                 </div>
             </div>
 
-            {/* Main chat area */}
+            {/* Main Chat Area */}
             <div className="flex-1 flex flex-col bg-white">
                 {selectedChat ? (
                     <>
-                        <div className="border-b border-gray-300 p-4 font-semibold text-gray-800">
-                            Chat with {selectedChat.username} ({selectedChat.user_id})
+                        <div className="p-4 border-b border-gray-300 text-lg font-semibold">
+                            Chat with {selectedChat.username}
                         </div>
-                        <div className="flex-1 p-4 overflow-y-auto">
+                        <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
                             {selectedChat.messages.map((msg) => (
                                 <div
                                     key={msg.message_id}
-                                    className={`flex items-start mb-4 cursor-pointer ${selectedMessage?.message_id === msg.message_id
-                                            ? "bg-gray-200"
+                                    className={`flex items-start mb-4 ${
+                                        selectedMessage?.message_id === msg.message_id
+                                            ? "bg-gray-200 rounded-lg p-3"
                                             : ""
-                                        }`}
+                                    }`}
                                     onClick={() => setSelectedMessage(msg)}
                                 >
-                                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
+                                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
                                         {selectedChat.username[0].toUpperCase()}
                                     </div>
                                     <div>
-                                        <p className="text-gray-700 bg-gray-100 p-2 rounded-lg">
+                                        <p className="bg-gray-100 p-3 rounded-lg text-gray-800 shadow-sm">
                                             {msg.content}
                                         </p>
                                         <p className="text-sm text-gray-500 mt-1">
@@ -199,18 +203,18 @@ export const Chat = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="p-4 border-t border-gray-300 flex items-center">
+                        <div className="p-4 bg-gray-100 border-t flex items-center">
                             <input
                                 type="text"
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()} // Send message on pressing Enter
-                                placeholder="Type your message"
-                                className="flex-1 px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+                                placeholder="Type your message..."
+                                className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
                             <button
                                 onClick={handleSendMessage}
-                                className="ml-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600"
+                                className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600"
                             >
                                 Send
                             </button>

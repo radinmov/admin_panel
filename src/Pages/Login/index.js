@@ -81,39 +81,36 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex bg-gray-100">
+        <div className="min-h-screen flex bg-black text-lime-500">
             <Sidebar />
-            <div className="w-1/4 p-6">
-
-            </div>
-
+            <div className="w-1/4 p-6"></div>
             <div className="flex-1 flex items-center justify-center p-8">
-                <div className="flex flex-col bg-white shadow-lg rounded-lg overflow-hidden max-w-md w-full">
+                <div className="flex flex-col bg-black shadow-lg rounded-lg overflow-hidden max-w-md w-full border border-lime-500">
                     <div className="p-8">
-                        <h2 className="text-2xl font-bold text-gray-700">Login to your admin Account</h2>
+                        <h2 className="text-2xl font-bold text-lime-500 text-center">Login to Your Admin Account</h2>
                         <form className="mt-8 space-y-4" onSubmit={handleLogin}>
                             <div>
-                                <label className="block text-gray-700">Your Username</label>
+                                <label className="block text-lime-500">Your Username</label>
                                 <input
                                     onChange={(e) => setUsername(e.target.value)}
                                     type="text"
                                     placeholder="Your username"
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-lime-500"
                                 />
                             </div>
                             <div>
-                                <label className="block text-gray-700">Password</label>
+                                <label className="block text-lime-500">Password</label>
                                 <input
                                     onChange={(e) => setPassword(e.target.value)}
                                     type="password"
                                     placeholder="Your password"
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-4 py-2 border rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-lime-500"
                                 />
                             </div>
-                            <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg text-sm">
+                            <button type="submit" className="w-full bg-lime-500 text-black py-2 rounded-lg text-sm hover:bg-lime-400">
                                 Login
                             </button>
-                            <Link to={"/register"} className="text-blue-600 hover:text-blue-800 mt-4 block text-center">
+                            <Link to={"/register"} className="text-lime-500 hover:text-lime-400 mt-4 block text-center">
                                 You don't have an account?
                             </Link>
                         </form>

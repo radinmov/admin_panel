@@ -54,44 +54,49 @@ const Investment = () => {
     }, [error]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
-            <p className="ml-4 text-blue-600 text-lg">Loading Investemnts...</p>
-        </div>;
+        return (
+            <div className="flex justify-center items-center h-screen bg-black">
+                <div className="w-16 h-16 border-4 border-green-500 border-dotted rounded-full animate-spin"></div>
+                <p className="ml-4 text-green-500 text-lg">Loading Investments...</p>
+            </div>
+        );
     }
 
     return (
-        <div className="flex">
+        <div className="flex bg-black">
             {/* Sidebar */}
             <Sidebar />
 
             {/* Main Content */}
-            <div className="flex-1 ml-64 p-8 bg-gray-100 min-h-screen">
-                <h1 className="text-2xl font-bold mb-4">Investments</h1>
+            <div className="flex-1 ml-64 p-8 bg-black min-h-screen">
+                <h1 className="text-3xl font-extrabold text-lime-500 mb-6">Investments</h1>
 
-                <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
-                    <table className="min-w-full table-auto">
+                <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-md">
+                    <table className="min-w-full table-auto text-white">
                         <thead>
-                            <tr className="bg-gray-200">
-                                <th className="px-4 py-2 text-left">Amount</th>
-                                <th className="px-4 py-2 text-left">Cycle Length</th>
-                                <th className="px-4 py-2 text-left">Start Time</th>
-                                <th className="px-4 py-2 text-left">Withdrawable Profit</th>
+                            <tr className="bg-lime-800">
+                                <th className="px-4 py-3 text-left font-semibold">Amount</th>
+                                <th className="px-4 py-3 text-left font-semibold">Cycle Length</th>
+                                <th className="px-4 py-3 text-left font-semibold">Start Time</th>
+                                <th className="px-4 py-3 text-left font-semibold">Withdrawable Profit</th>
                             </tr>
                         </thead>
                         <tbody>
                             {investments.length > 0 ? (
                                 investments.map((investment) => (
-                                    <tr key={investment.id} className="border-b">
-                                        <td className="px-4 py-2">{investment.amount}</td>
-                                        <td className="px-4 py-2">{investment.cycle_length}</td>
-                                        <td className="px-4 py-2">{new Date(investment.start_time).toLocaleString()}</td>
-                                        <td className="px-4 py-2">{investment.withdrawable_profit}</td>
+                                    <tr
+                                        key={investment.id}
+                                        className="border-b hover:bg-gray-700 transition-colors"
+                                    >
+                                        <td className="px-4 py-3">${investment.amount.toLocaleString()}</td>
+                                        <td className="px-4 py-3">{investment.cycle_length} days</td>
+                                        <td className="px-4 py-3">{new Date(investment.start_time).toLocaleString()}</td>
+                                        <td className="px-4 py-3">${investment.withdrawable_profit.toLocaleString()}</td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="px-4 py-2 text-center">
+                                    <td colSpan="4" className="px-4 py-3 text-center text-gray-400">
                                         No investments found
                                     </td>
                                 </tr>

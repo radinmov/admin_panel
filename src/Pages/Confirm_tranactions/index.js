@@ -72,21 +72,21 @@ function ConfirmTransaction() {
     return (
         <>
             <Sidebar />
-            <div className="h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white shadow-lg rounded-lg p-8">
-                    <h2 className="text-2xl font-semibold text-center mb-6">
+            <div className="h-screen flex items-center justify-center bg-black">
+                <div className="bg-black shadow-lg rounded-lg p-8 text-white">
+                    <h2 className="text-2xl font-semibold text-center mb-6 text-lime-500">
                         Confirm Transaction
                     </h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm mb-2">
+                            <label className="block text-lime-500 text-sm mb-2">
                                 Transaction ID
                             </label>
                             <input
                                 type="text"
-                                value={transactionId} // Prefilled from URL
-                                readOnly // Make it read-only
-                                className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={transactionId} 
+                                readOnly 
+                                className="w-full px-3 py-2 border rounded-lg text-black bg-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-500"
                             />
                         </div>
 
@@ -95,9 +95,9 @@ function ConfirmTransaction() {
                                 type="checkbox"
                                 checked={confirm}
                                 onChange={(e) => setConfirm(e.target.checked)}
-                                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                className="mr-2 h-4 w-4 text-lime-500 focus:ring-lime-500"
                             />
-                            <label className="text-gray-700 text-sm">
+                            <label className="text-lime-500 text-sm">
                                 Confirm Transaction
                             </label>
                         </div>
@@ -105,8 +105,8 @@ function ConfirmTransaction() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
-                                isLoading ? "bg-gray-500" : "bg-blue-500 hover:bg-blue-600"
+                            className={`w-full text-black font-semibold py-2 rounded-lg transition duration-300 bg-lime-500 ${
+                                isLoading ? "opacity-50" : "hover:bg-white hover:text-lime-500"
                             }`}
                         >
                             {isLoading ? "Processing..." : "Submit"}

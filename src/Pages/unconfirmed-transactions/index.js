@@ -58,45 +58,47 @@ const UnconfirmedTransactions = () => {
     }, [error]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className="w-16 h-16 border-4 border-blue-500 border-dotted rounded-full animate-spin"></div>
-            <p className="ml-4 text-blue-600 text-lg">Loading unconfirmed transactions...</p>
-        </div>;
+        return (
+            <div className="flex justify-center items-center h-screen bg-black">
+                <div className="w-16 h-16 border-4 border-lime-500 border-dotted rounded-full animate-spin"></div>
+                <p className="ml-4 text-lime-500 text-lg">Loading unconfirmed transactions...</p>
+            </div>
+        );
     }
 
     return (
         <div className="flex">
             <Sidebar />
 
-            <div className="flex-1 ml-64 p-8 bg-gray-100 min-h-screen">
-                <h1 className="text-2xl font-bold mb-4">Unconfirmed Transactions</h1>
+            <div className="flex-1 ml-64 p-8 bg-black min-h-screen">
+                <h1 className="text-2xl font-bold mb-4 text-lime-500">Unconfirmed Transactions</h1>
 
-                <div className="overflow-x-auto bg-white rounded-lg shadow-lg">
+                <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
                     <table className="min-w-full table-auto">
                         <thead>
-                            <tr className="bg-gray-200">
-                                <th className="px-4 py-2 text-left">Amount</th>
-                                <th className="px-4 py-2 text-left">Description</th>
-                                <th className="px-4 py-2 text-left">Request Date</th>
-                                <th className="px-4 py-2 text-left">Type</th>
-                                <th className="px-4 py-2 text-left">User ID</th>
-                                <th className="px-4 py-2 text-left">Transaction ID</th>
-                                <th className="px-4 py-2 text-left">Actions</th>
+                            <tr className="bg-gray-900">
+                                <th className="px-4 py-2 text-left text-lime-500">Amount</th>
+                                <th className="px-4 py-2 text-left text-lime-500">Description</th>
+                                <th className="px-4 py-2 text-left text-lime-500">Request Date</th>
+                                <th className="px-4 py-2 text-left text-lime-500">Type</th>
+                                <th className="px-4 py-2 text-left text-lime-500">User ID</th>
+                                <th className="px-4 py-2 text-left text-lime-500">Transaction ID</th>
+                                <th className="px-4 py-2 text-left text-lime-500">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {unconfirmedTransactions.length > 0 ? (
                                 unconfirmedTransactions.map((transaction) => (
-                                    <tr key={transaction.id} className="border-b">
-                                        <td className="px-4 py-2">{transaction.amount}T</td>
-                                        <td className="px-4 py-2">{transaction.description}</td>
-                                        <td className="px-4 py-2">{transaction.request_date}</td>
-                                        <td className="px-4 py-2">{transaction.type}</td>
-                                        <td className="px-4 py-2">{transaction.user_id}</td>
-                                        <td className="px-4 py-2">{transaction.id}</td>
+                                    <tr key={transaction.id} className="border-b border-lime-500">
+                                        <td className="px-4 py-2 text-white">{transaction.amount}T</td>
+                                        <td className="px-4 py-2 text-white">{transaction.description}</td>
+                                        <td className="px-4 py-2 text-white">{transaction.request_date}</td>
+                                        <td className="px-4 py-2 text-white">{transaction.type}</td>
+                                        <td className="px-4 py-2 text-white">{transaction.user_id}</td>
+                                        <td className="px-4 py-2 text-white">{transaction.id}</td>
                                         <td className="px-4 py-2">
                                             <button
-                                                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                                className="bg-lime-500 text-black px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-lime-500"
                                                 onClick={() => navigate(`/admin/confirm-transaction/${transaction.id}`)}
                                             >
                                                 Confirm
@@ -106,7 +108,9 @@ const UnconfirmedTransactions = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="7" className="px-4 py-2 text-center">No unconfirmed transactions found</td>
+                                    <td colSpan="7" className="px-4 py-2 text-center text-lime-500">
+                                        No unconfirmed transactions found
+                                    </td>
                                 </tr>
                             )}
                         </tbody>
