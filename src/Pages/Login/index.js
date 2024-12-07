@@ -83,19 +83,8 @@ export default function Login() {
     return (
         <div className="min-h-screen flex bg-gray-100">
             <Sidebar />
-            <div className="w-1/4 bg-white border-r border-gray-300 p-6">
-                <h2 className="text-2xl font-bold text-gray-700 mb-4">Admin Panel</h2>
-                <ul>
-                    <li className="mb-4">
-                        <Link to="/admin/home" className="text-blue-600 hover:text-blue-800">Home</Link>
-                    </li>
-                    <li className="mb-4">
-                        <Link to="/admin/transactions" className="text-blue-600 hover:text-blue-800">Transactions</Link>
-                    </li>
-                    <li className="mb-4">
-                        <Link to="/admin/messages" className="text-blue-600 hover:text-blue-800">Messages</Link>
-                    </li>
-                </ul>
+            <div className="w-1/4 p-6">
+
             </div>
 
             <div className="flex-1 flex items-center justify-center p-8">
