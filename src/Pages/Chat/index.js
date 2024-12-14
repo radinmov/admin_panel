@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../config";
 import useTitle from "../../Componets/Hook/useTitle";
@@ -11,8 +11,23 @@ export const Chat = () => {
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [theme, setTheme] = useState("dark");
     const token = localStorage.getItem("token");
+    const navigate = useNavigate()
     useTitle("Admin Chat");
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem("theme") || "dark";
+        setTheme(savedTheme);
+        document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    }, []);
+
+    const toggleTheme = () => {
+        const newTheme = theme === "dark" ? "light" : "dark";
+        setTheme(newTheme);
+        localStorage.setItem("theme", newTheme);
+        document.documentElement.classList.toggle("dark", newTheme === "dark");
+    };
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -24,6 +39,10 @@ export const Chat = () => {
                         "Content-Type": "application/json",
                     },
                 });
+
+                if (response.status === 401) {
+                    throw new Error("Unauthorized. Please log in again.");
+                }
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -52,7 +71,19 @@ export const Chat = () => {
                 setMessages(mergedMessages);
                 setError(null);
             } catch (err) {
-                setError(err.message);
+                if (err.message === "Unauthorized. Please log in again.") {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Unauthorized",
+                        text: "Your session has expired. Please log in again.",
+                        confirmButtonText: "OK",
+                    }).then(() => {
+                        localStorage.removeItem("token"); // Clear the token
+
+                    });
+                } else {
+                    setError(err.message);
+                }
             } finally {
                 setIsLoading(false);
             }
@@ -103,6 +134,10 @@ export const Chat = () => {
                 }
             );
 
+            if (response.status === 401) {
+                throw new Error("Unauthorized. Please log in again.");
+            }
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "An error occurred.");
@@ -118,23 +153,41 @@ export const Chat = () => {
                 window.location.reload();
             });
         } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: error.message || "Something went wrong. Please try again.",
-            });
+            if (error.message === "Unauthorized. Please log in again.") {
+                Swal.fire({
+                    icon: "error",
+                    title: "Unauthorized",
+                    text: "Your session has expired. Please log in again.",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    localStorage.removeItem("token"); // Clear the token
+                    navigate("/")
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.message || "Something went wrong. Please try again.",
+                });
+            }
         }
     };
 
     return (
-        <div className="flex h-screen bg-gray-50">
+        <div className={`flex h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
             {/* Sidebar */}
-            <div className="w-1/3 bg-gray-900 text-gray-200 border-r border-gray-800 overflow-y-auto">
+            <div className={`w-1/3 ${theme === "dark" ? "bg-gray-800 text-gray-200" : "bg-gray-200 text-gray-900"} border-r border-gray-800 overflow-y-auto`}>
                 <Link to="/admin/home">
                     <div className="p-4 text-lg font-bold text-center hover:bg-gray-800 transition">
                         Back to Home
                     </div>
                 </Link>
+                <button
+                    className="p-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 absolute top-4 right-4"
+                    onClick={toggleTheme}
+                >
+                    {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+                </button>
                 <div className="space-y-4">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-full">
@@ -147,11 +200,10 @@ export const Chat = () => {
                         messages.map((chat) => (
                             <div
                                 key={chat.user_id}
-                                className={`flex items-center p-4 cursor-pointer rounded-lg transition ${
-                                    selectedChat?.user_id === chat.user_id
+                                className={`flex items-center p-4 cursor-pointer rounded-lg transition ${selectedChat?.user_id === chat.user_id
                                         ? "bg-gray-700"
                                         : "hover:bg-gray-800"
-                                }`}
+                                    }`}
                                 onClick={() => setSelectedChat(chat)}
                             >
                                 <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
@@ -172,7 +224,7 @@ export const Chat = () => {
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col bg-white">
+            <div className="flex-1 flex flex-col bg-gray-100">
                 {selectedChat ? (
                     <>
                         <div className="p-4 border-b border-gray-300 text-lg font-semibold">
@@ -182,11 +234,10 @@ export const Chat = () => {
                             {selectedChat.messages.map((msg) => (
                                 <div
                                     key={msg.message_id}
-                                    className={`flex items-start mb-4 ${
-                                        selectedMessage?.message_id === msg.message_id
+                                    className={`flex items-start mb-4 ${selectedMessage?.message_id === msg.message_id
                                             ? "bg-gray-200 rounded-lg p-3"
                                             : ""
-                                    }`}
+                                        }`}
                                     onClick={() => setSelectedMessage(msg)}
                                 >
                                     <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold mr-3">
@@ -203,26 +254,24 @@ export const Chat = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="p-4 bg-gray-100 border-t flex items-center">
-                            <input
-                                type="text"
+                        <div className="p-4 bg-gray-100 border-t border-gray-300">
+                            <textarea
+                                className="w-full p-3 border rounded-lg focus:outline-none"
+                                placeholder="Type your message here..."
                                 value={newMessage}
                                 onChange={(e) => setNewMessage(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-                                placeholder="Type your message..."
-                                className="flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
                             <button
+                                className="bg-green-500 text-white px-4 py-2 rounded-lg mt-2 hover:bg-green-600"
                                 onClick={handleSendMessage}
-                                className="ml-4 px-4 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600"
                             >
                                 Send
                             </button>
                         </div>
                     </>
                 ) : (
-                    <div className="flex-1 flex items-center justify-center text-gray-500">
-                        Select a chat to view messages
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                        Select a chat to start messaging.
                     </div>
                 )}
             </div>
