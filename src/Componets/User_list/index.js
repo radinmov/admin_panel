@@ -19,7 +19,7 @@ const UserList = () => {
         icon: "warning",
         confirmButtonText: "Log In",
       }).then(() => {
-        navigate("/login");
+        navigate("/");
       });
       return;
     }

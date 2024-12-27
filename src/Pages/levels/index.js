@@ -4,8 +4,10 @@ import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
 import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 function Settings() {
+    const navigate = useNavigate(); 
     const [minActiveUser, setMinActiveUser] = useState("");
     const [minAmount, setMinAmount] = useState("");
     const [profitMultiplier, setProfitMultiplier] = useState("");
@@ -19,12 +21,15 @@ function Settings() {
             const token = localStorage.getItem("token");
             if (!token) {
                 Swal.fire({
-                    icon: "error",
-                    title: "Authentication Error",
-                    text: "No token found. Please log in.",
+                  title: "Unauthorized",
+                  text: "You need to log in to access this page.",
+                  icon: "warning",
+                  confirmButtonText: "Log In",
+                }).then(() => {
+                  navigate("/");
                 });
                 return;
-            }
+              }
 
             try {
                 const response = await axios.get(`${BASE_URL}/api/v1/admin/levels`, {

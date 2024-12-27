@@ -11,23 +11,9 @@ export const Chat = () => {
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [theme, setTheme] = useState("dark");
     const token = localStorage.getItem("token");
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     useTitle("Admin Chat");
-
-    useEffect(() => {
-        const savedTheme = localStorage.getItem("theme") || "dark";
-        setTheme(savedTheme);
-        document.documentElement.classList.toggle("dark", savedTheme === "dark");
-    }, []);
-
-    const toggleTheme = () => {
-        const newTheme = theme === "dark" ? "light" : "dark";
-        setTheme(newTheme);
-        localStorage.setItem("theme", newTheme);
-        document.documentElement.classList.toggle("dark", newTheme === "dark");
-    };
 
     useEffect(() => {
         const fetchMessages = async () => {
@@ -41,7 +27,8 @@ export const Chat = () => {
                 });
 
                 if (response.status === 401) {
-                    throw new Error("Unauthorized. Please log in again.");
+                    throw new Error("Unauthorized. Please log  in again.");
+                    navigate("/");
                 }
 
                 if (!response.ok) {
@@ -79,7 +66,6 @@ export const Chat = () => {
                         confirmButtonText: "OK",
                     }).then(() => {
                         localStorage.removeItem("token"); // Clear the token
-
                     });
                 } else {
                     setError(err.message);
@@ -136,6 +122,7 @@ export const Chat = () => {
 
             if (response.status === 401) {
                 throw new Error("Unauthorized. Please log in again.");
+                navigate("/");
             }
 
             if (!response.ok) {
@@ -160,8 +147,8 @@ export const Chat = () => {
                     text: "Your session has expired. Please log in again.",
                     confirmButtonText: "OK",
                 }).then(() => {
-                    localStorage.removeItem("token"); // Clear the token
-                    navigate("/")
+                    localStorage.removeItem("token");
+                    navigate("/");
                 });
             } else {
                 Swal.fire({
@@ -174,20 +161,14 @@ export const Chat = () => {
     };
 
     return (
-        <div className={`flex h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+        <div className="flex h-screen bg-gray-50 text-gray-900">
             {/* Sidebar */}
-            <div className={`w-1/3 ${theme === "dark" ? "bg-gray-800 text-gray-200" : "bg-gray-200 text-gray-900"} border-r border-gray-800 overflow-y-auto`}>
+            <div className="w-1/3 bg-gray-200 text-gray-900 border-r border-gray-800 overflow-y-auto">
                 <Link to="/admin/home">
                     <div className="p-4 text-lg font-bold text-center hover:bg-gray-800 transition">
                         Back to Home
                     </div>
                 </Link>
-                <button
-                    className="p-2 rounded-full bg-gray-700 text-white hover:bg-gray-600 absolute top-4 right-4"
-                    onClick={toggleTheme}
-                >
-                    {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
-                </button>
                 <div className="space-y-4">
                     {isLoading ? (
                         <div className="flex justify-center items-center h-full">

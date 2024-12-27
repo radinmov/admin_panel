@@ -17,18 +17,20 @@ const UserTransactions = () => {
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                setIsLoading(true); // Start loader
+                setIsLoading(true); 
                 const token = localStorage.getItem("token");
 
                 if (!token) {
                     Swal.fire({
-                        icon: "error",
-                        title: "Unauthorized",
-                        text: "Please log in first.",
+                      title: "Unauthorized",
+                      text: "You need to log in to access this page.",
+                      icon: "warning",
+                      confirmButtonText: "Log In",
+                    }).then(() => {
+                      navigate("/");
                     });
-                    navigate("/login");
                     return;
-                }
+                  }
 
                 const response = await axios.get(`${BASE_URL}/api/v1/admin/users/${userId}/transactions`, {
                     headers: {

@@ -4,26 +4,30 @@ import Swal from 'sweetalert2';
 import Sidebar from '../../Componets/Sidebar';
 import useTitle from '../../Componets/Hook/useTitle';
 import { BASE_URL } from '../../config';
+import { useNavigate } from 'react-router-dom';
 
 const Investment = () => {
     useTitle("Investments");
     const [investments, setInvestments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate =useNavigate()
 
     useEffect(() => {
         const fetchInvestments = async () => {
             try {
                 const token = localStorage.getItem('token');
-
                 if (!token) {
                     Swal.fire({
-                        icon: 'error',
-                        title: 'Unauthorized',
-                        text: 'Please log in first.',
+                      title: "Unauthorized",
+                      text: "You need to log in to access this page.",
+                      icon: "warning",
+                      confirmButtonText: "Log In",
+                    }).then(() => {
+                      navigate("/");
                     });
                     return;
-                }
+                  }
 
                 const response = await axios.get(`${BASE_URL}/api/v1/admin/investments`, {
                     headers: {

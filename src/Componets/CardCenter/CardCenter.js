@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import Card from "../Card/Cart";
+import { useNavigate } from "react-router-dom";
 
 const CardCenter = () => {
+  const navigate = useNavigate()
+
   const [data, setData] = useState({
     total_investment_amount: 0,
     total_locked_profit: 0,
@@ -16,9 +19,12 @@ const CardCenter = () => {
         const token = localStorage.getItem("token");
         if (!token) {
           Swal.fire({
-            icon: "error",
             title: "Unauthorized",
-            text: "Please log in first.",
+            text: "You need to log in to access this page.",
+            icon: "warning",
+            confirmButtonText: "Log In",
+          }).then(() => {
+            navigate("/");
           });
           return;
         }

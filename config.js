@@ -6,4 +6,4 @@ const app = serve('build', {
   single: true
 });
 
-console.log('React app is being served at http://localhost:3000');
+// console.log('React app is being served at http://localhost:3000');

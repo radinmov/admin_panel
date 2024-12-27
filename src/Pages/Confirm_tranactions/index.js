@@ -7,7 +7,7 @@ import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
 
 function ConfirmTransaction() {
-    const { transactionId } = useParams(); // Retrieve transaction ID from the URL
+    const { transactionId } = useParams(); 
     const [confirm, setConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 

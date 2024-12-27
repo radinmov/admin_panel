@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import Sidebar from "../../Componets/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 export const UInvestment = () => {
     const [investmentId, setInvestmentId] = useState("");
     const [amount, setAmount] = useState("");
     const [loading, setLoading] = useState(false);
+    const navigate  = useNavigate()
 
     const handleUpdate = async (e) => {
         e.preventDefault();
@@ -13,12 +15,15 @@ export const UInvestment = () => {
         const token = localStorage.getItem("token");
         if (!token) {
             Swal.fire({
-                icon: "error",
-                title: "Unauthorized",
-                text: "You need to log in to perform this action.",
+              title: "Unauthorized",
+              text: "You need to log in to access this page.",
+              icon: "warning",
+              confirmButtonText: "Log In",
+            }).then(() => {
+              navigate("/");
             });
             return;
-        }
+          }
 
         try {
             setLoading(true);
