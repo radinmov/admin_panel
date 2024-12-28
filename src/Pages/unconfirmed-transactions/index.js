@@ -16,33 +16,33 @@ const UnconfirmedTransactions = () => {
     const { checkToken } = useTokenHandling();
 
     useEffect(() => {
-        const fetchUnconfirmedTransactions = async () => {
-            try {
-                if (!checkToken()) return;
+        const fetchUnconfirmedTransactions = () => {
+            if (!checkToken()) return;
 
-                const token = localStorage.getItem('token');
-                const response = await axios.get(`${BASE_URL}/api/v1/admin/unconfirmed-transactions`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+            const token = localStorage.getItem('token');
 
-                const transactions = Array.isArray(response.data.unconfirmed_transactions)
-                    ? response.data.unconfirmed_transactions
-                    : [];
-
-                setUnconfirmedTransactions(transactions);
-                setLoading(false);
-            } catch (err) {
+            fetch(`${BASE_URL}/api/v1/admin/unconfirmed-transactions`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            })
+            .then((response) => response.json()) 
+            .then((data) => {
+                setUnconfirmedTransactions(data.unconfirmed_transactions)
+                 setLoading(false);
+            })
+            .catch((err) => {
                 setError('Failed to fetch unconfirmed transactions');
                 setLoading(false);
-            }
+                console.error('Error:', err);
+            });
         };
-
+        
         fetchUnconfirmedTransactions();
     }, []);
 
-    const deleteTransaction = async (id) => {
+    const deleteTransaction = (id) => {
         Swal.fire({
             title: 'Are you sure?',
             text: "This action cannot be undone!",
@@ -51,24 +51,29 @@ const UnconfirmedTransactions = () => {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',
-        }).then(async (result) => {
+        }).then((result) => {
             if (result.isConfirmed) {
-                try {
-                    const token = localStorage.getItem('token');
-                    await axios.delete(`${BASE_URL}/api/v1/admin/unc-tran/delete/${id}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-
-                    setUnconfirmedTransactions((prevTransactions) =>
-                        prevTransactions.filter((transaction) => transaction.id !== id)
-                    );
-
-                    Swal.fire('Deleted!', 'The transaction has been deleted.', 'success');
-                } catch (err) {
+                const token = localStorage.getItem('token');
+                fetch(`${BASE_URL}/api/v1/admin/unc_tran/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                .then((response) => {
+                    if (response.ok) {
+                        setUnconfirmedTransactions((prevTransactions) =>
+                            prevTransactions.filter((transaction) => transaction.id !== id)
+                        );
+                        Swal.fire('Deleted!', 'The transaction has been deleted.', 'success');
+                    } else {
+                        Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
+                    }
+                })
+                .catch((err) => {
                     Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
-                }
+                    console.error('Error:', err);
+                });
             }
         });
     };
