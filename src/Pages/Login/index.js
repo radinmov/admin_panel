@@ -101,7 +101,7 @@ export default function Login() {
 
     return (
         <div className="h-screen bg-black text-lime-500 flex items-center justify-center">
-            <div className="flex flex-col bg-black shadow-lg rounded-lg overflow-hidden max-w-md w-full border border-lime-500">
+            <div className="flex flex-col bg-black shadow-lg rounded-lg overflow-hidden max-w-md w-full border border-lime-500 h-[350px] w-[390px]">
                 <div className="p-8">
                     <h2 className="text-2xl font-bold text-lime-500 text-center">Login to Your Admin Account</h2>
                     <form className="mt-8 space-y-4" onSubmit={handleLogin}>

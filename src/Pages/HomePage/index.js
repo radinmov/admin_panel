@@ -2,8 +2,14 @@ import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
 import CardCenter from "../../Componets/CardCenter/CardCenter"
 import UserList from "../../Componets/User_list";
+import { useTokenHandling } from "../../Componets/token_handling";
 export function Home() {
+  const { checkToken } = useTokenHandling(); 
+
   useTitle("admin_Home");
+  
+  if (!checkToken()) return; 
+
 
   return (
     <div className="flex h-screen bg-black text-gray-100">

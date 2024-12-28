@@ -3,26 +3,20 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { BASE_URL } from "../../config";
+import { useTokenHandling } from "../token_handling";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { checkToken } = useTokenHandling();
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (!token) {
-      Swal.fire({
-        title: "Unauthorized",
-        text: "You need to log in to access this page.",
-        icon: "warning",
-        confirmButtonText: "Log In",
-      }).then(() => {
-        navigate("/");
-      });
-      return;
-    }
+    if (!checkToken()) return;
+
 
     axios
       .get(`${BASE_URL}/api/v1/admin/users`, {
@@ -31,9 +25,10 @@ const UserList = () => {
           "Content-Type": "application/json",
         },
       })
-      .then((response) => {
+      .then((response) => {        
         if (Array.isArray(response.data)) {
           setUsers(response.data);
+          
         } else if (response.data && Array.isArray(response.data.users)) {
           setUsers(response.data.users);
         } else {
@@ -93,6 +88,7 @@ const UserList = () => {
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Total Invested</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Profit 30 Days</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Profit 30 Days</th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-300">referred_by</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Actions</th>
               </tr>
             </thead>
@@ -106,6 +102,7 @@ const UserList = () => {
                   <td className="px-4 py-2 text-gray-300">{user.total_amount_invested}</td>
                   <td className="px-4 py-2 text-gray-300">{user.total_profit_less_than_30_days}</td>
                   <td className="px-4 py-2 text-gray-300">{user.total_profit_more_than_30_days}</td>
+                  <td className="px-4 py-2 text-gray-300">{user.referred_by}</td>
                   <td className="px-4 py-2 flex space-x-2">
                     <button
                       onClick={() => handleNavigation(`/admin/transactions/user/${user.id}`)}

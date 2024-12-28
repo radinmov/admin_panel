@@ -4,41 +4,31 @@ import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
 import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
+import { useTokenHandling } from "../../Componets/token_handling";
 
 function Settings() {
-    const navigate = useNavigate(); 
     const [minActiveUser, setMinActiveUser] = useState("");
     const [minAmount, setMinAmount] = useState("");
     const [profitMultiplier, setProfitMultiplier] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [levels, setLevels] = useState([]);
     useTitle("admin_setting");
+    const { checkToken } = useTokenHandling(); 
 
-    // Fetch levels from API on component mount
     useEffect(() => {
         const fetchLevels = async () => {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                Swal.fire({
-                  title: "Unauthorized",
-                  text: "You need to log in to access this page.",
-                  icon: "warning",
-                  confirmButtonText: "Log In",
-                }).then(() => {
-                  navigate("/");
-                });
-                return;
-              }
+            if (!checkToken()) return; 
 
+            const token = localStorage.getItem("token");
             try {
                 const response = await axios.get(`${BASE_URL}/api/v1/admin/levels`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 });
+
                 if (response.data) {
-                    setLevels(response.data); 
+                    setLevels(response.data);
                 } else {
                     Swal.fire({
                         icon: "info",
@@ -56,25 +46,19 @@ function Settings() {
         };
 
         fetchLevels();
-    }, []);
+    }, [checkToken]);
 
     // Handle level update submission
     const handleLevelSubmit = async (e) => {
         e.preventDefault();
+        if (!checkToken()) return; // Redirect if unauthorized
+
         const data = {
             min_active_users: minActiveUser,
             min_amount: minAmount,
             profit_multiplier: profitMultiplier,
         };
         const token = localStorage.getItem("token");
-        if (!token) {
-            Swal.fire({
-                icon: "error",
-                title: "Authentication Error",
-                text: "No token found. Please log in.",
-            });
-            return;
-        }
 
         try {
             setIsLoading(true);
@@ -115,7 +99,7 @@ function Settings() {
                 text: error.response?.data?.message || "Failed to update settings. Please try again.",
             });
         } finally {
-            setIsLoading(false); // End loading state
+            setIsLoading(false);
         }
     };
 
@@ -145,7 +129,7 @@ function Settings() {
                                 type="number"
                                 value={minActiveUser}
                                 onChange={(e) => setMinActiveUser(e.target.value)}
-                                onKeyDown={handleKeyDown} // Handle Enter key
+                                onKeyDown={handleKeyDown}
                                 className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
                                 placeholder="Enter minimum active users"
                                 required
@@ -160,7 +144,7 @@ function Settings() {
                                 type="number"
                                 value={minAmount}
                                 onChange={(e) => setMinAmount(e.target.value)}
-                                onKeyDown={handleKeyDown} 
+                                onKeyDown={handleKeyDown}
                                 className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
                                 placeholder="Enter minimum amount"
                                 required
@@ -185,7 +169,7 @@ function Settings() {
 
                         <button
                             type="submit"
-                            disabled={isLoading} 
+                            disabled={isLoading}
                             className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
                                 isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
                             }`}

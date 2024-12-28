@@ -5,32 +5,28 @@ import useTitle from "../../Componets/Hook/useTitle";
 import Sidebar from "../../Componets/Sidebar";
 import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
+import { useTokenHandling } from "../../Componets/token_handling";
 
 function ConfirmTransaction() {
     const { transactionId } = useParams(); 
     const [confirm, setConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { checkToken } = useTokenHandling(); 
 
     useTitle("Confirm-transactions");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        
+        
         const data = {
             transaction_id: transactionId,
             confirm: confirm,
         };
-
+        
         const token = localStorage.getItem("token");
-
-        if (!token) {
-            Swal.fire({
-                icon: "error",
-                title: "Authentication Error",
-                text: "No token found. Please log in.",
-            });
-            return;
-        }
+        
+        if (!checkToken()) return; 
 
         try {
             setIsLoading(true);

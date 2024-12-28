@@ -5,6 +5,7 @@ import axios from "axios";
 import Sidebar from "../../Componets/Sidebar";
 import useTitle from "../../Componets/Hook/useTitle";
 import { BASE_URL } from "../../config";
+import { useTokenHandling } from "../../Componets/token_handling";
 
 const UserTransactions = () => {
     useTitle("User Transactions");
@@ -13,25 +14,16 @@ const UserTransactions = () => {
     const [transactions, setTransactions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { checkToken } = useTokenHandling();
+
 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                setIsLoading(true); 
+                setIsLoading(true);
+
+                if (!checkToken()) return;
                 const token = localStorage.getItem("token");
-
-                if (!token) {
-                    Swal.fire({
-                      title: "Unauthorized",
-                      text: "You need to log in to access this page.",
-                      icon: "warning",
-                      confirmButtonText: "Log In",
-                    }).then(() => {
-                      navigate("/");
-                    });
-                    return;
-                  }
-
                 const response = await axios.get(`${BASE_URL}/api/v1/admin/users/${userId}/transactions`, {
                     headers: {
                         Authorization: `Bearer ${token}`,

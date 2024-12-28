@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../config";
 import useTitle from "../../Componets/Hook/useTitle";
+import { useTokenHandling } from "../../Componets/token_handling";
 
 export const Chat = () => {
     const [selectedChat, setSelectedChat] = useState(null);
@@ -11,12 +12,14 @@ export const Chat = () => {
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { checkToken } = useTokenHandling(); 
     const token = localStorage.getItem("token");
     const navigate = useNavigate();
     useTitle("Admin Chat");
 
     useEffect(() => {
         const fetchMessages = async () => {
+            if (!checkToken()) return; 
             try {
                 setIsLoading(true);
                 const response = await fetch(`${BASE_URL}/api/v1/admin/messages`, {

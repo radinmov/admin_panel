@@ -1,30 +1,22 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import Sidebar from "../../Componets/Sidebar";
+// import Tokenhandling
 import { useNavigate } from "react-router-dom";
+import { useTokenHandling } from "../../Componets/token_handling";
 
 export const UInvestment = () => {
     const [investmentId, setInvestmentId] = useState("");
     const [amount, setAmount] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate  = useNavigate()
+    const navigate  = useNavigate();
+    const { checkToken } = useTokenHandling(); 
+
 
     const handleUpdate = async (e) => {
         e.preventDefault();
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-            Swal.fire({
-              title: "Unauthorized",
-              text: "You need to log in to access this page.",
-              icon: "warning",
-              confirmButtonText: "Log In",
-            }).then(() => {
-              navigate("/");
-            });
-            return;
-          }
-
+        const token = localStorage.getItem('token')
+        if (!checkToken()) return; 
         try {
             setLoading(true);
 

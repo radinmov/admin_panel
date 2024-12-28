@@ -4,6 +4,8 @@ import axios from 'axios';
 import Sidebar from '../../Componets/Sidebar/index';
 import useTitle from '../../Componets/Hook/useTitle';
 import Swal from 'sweetalert2';
+import { useTokenHandling } from '../../Componets/token_handling';
+import { BASE_URL } from '../../config';
 
 const UnconfirmedTransactions = () => {
     useTitle("admin_Login");
@@ -11,22 +13,15 @@ const UnconfirmedTransactions = () => {
     const [unconfirmedTransactions, setUnconfirmedTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { checkToken } = useTokenHandling();
 
     useEffect(() => {
         const fetchUnconfirmedTransactions = async () => {
             try {
+                if (!checkToken()) return;
+
                 const token = localStorage.getItem('token');
-
-                if (!token) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Unauthorized',
-                        text: 'Please log in first.',
-                    });
-                    return;
-                }
-
-                const response = await axios.get('http://46.100.94.88:3003/api/v1/admin/unconfirmed-transactions', {
+                const response = await axios.get(`${BASE_URL}/api/v1/admin/unconfirmed-transactions`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -46,6 +41,37 @@ const UnconfirmedTransactions = () => {
 
         fetchUnconfirmedTransactions();
     }, []);
+
+    const deleteTransaction = async (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This action cannot be undone!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const token = localStorage.getItem('token');
+                    await axios.delete(`${BASE_URL}/api/v1/admin/unc-tran/delete/${id}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    setUnconfirmedTransactions((prevTransactions) =>
+                        prevTransactions.filter((transaction) => transaction.id !== id)
+                    );
+
+                    Swal.fire('Deleted!', 'The transaction has been deleted.', 'success');
+                } catch (err) {
+                    Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
+                }
+            }
+        });
+    };
 
     useEffect(() => {
         if (error) {
@@ -69,10 +95,8 @@ const UnconfirmedTransactions = () => {
     return (
         <div className="flex">
             <Sidebar />
-
             <div className="flex-1 ml-64 p-8 bg-black min-h-screen">
                 <h1 className="text-2xl font-bold mb-4 text-lime-500">Unconfirmed Transactions</h1>
-
                 <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
                     <table className="min-w-full table-auto">
                         <thead>
@@ -96,12 +120,18 @@ const UnconfirmedTransactions = () => {
                                         <td className="px-4 py-2 text-white">{transaction.type}</td>
                                         <td className="px-4 py-2 text-white">{transaction.user_id}</td>
                                         <td className="px-4 py-2 text-white">{transaction.id}</td>
-                                        <td className="px-4 py-2">
+                                        <td className="px-4 py-2 flex space-x-2">
                                             <button
                                                 className="bg-lime-500 text-black px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-lime-500"
                                                 onClick={() => navigate(`/admin/confirm-transaction/${transaction.id}`)}
                                             >
                                                 Confirm
+                                            </button>
+                                            <button
+                                                className="bg-red-500 text-black px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-red-500"
+                                                onClick={() => deleteTransaction(transaction.id)}
+                                            >
+                                                Delete
                                             </button>
                                         </td>
                                     </tr>
