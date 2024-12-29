@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
-import axios from "axios";
-import { BASE_URL } from "../../config";
-import { useTokenHandling } from "../token_handling";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { BASE_URL } from '../../config';
+import { useTokenHandling } from '../token_handling';
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -11,59 +11,71 @@ const UserList = () => {
   const navigate = useNavigate();
   const { checkToken } = useTokenHandling();
 
-
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
 
-    if (!checkToken()) return;
+    if (!checkToken()) return; // Check token before making the API call
 
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/v1/admin/users`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-    axios
-      .get(`${BASE_URL}/api/v1/admin/users`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {        
+        // Handle the response data correctly
         if (Array.isArray(response.data)) {
           setUsers(response.data);
-          
         } else if (response.data && Array.isArray(response.data.users)) {
           setUsers(response.data.users);
         } else {
           Swal.fire({
-            title: "Unexpected Data",
-            text: "The data received is not in the expected format.",
-            icon: "error",
-            confirmButtonText: "Okay",
+            title: 'Unexpected Data',
+            text: 'The data received is not in the expected format.',
+            icon: 'error',
+            confirmButtonText: 'Okay',
           });
         }
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the users!", error);
-        Swal.fire({
-          title: "Error",
-          text: "Failed to fetch user data. Please try again later.",
-          icon: "error",
-          confirmButtonText: "Okay",
-        });
-      })
-      .finally(() => {
+      } catch (error) {
+        // Handle specific 401 errors
+        if (error.response && error.response.status === 401) {
+          Swal.fire({
+            title: 'Unauthorized',
+            text: 'Your session has expired or you are not authorized.',
+            icon: 'error',
+            confirmButtonText: 'Log In',
+          }).then(() => {
+            navigate('/'); 
+          });
+        } else {
+          // Other errors
+          Swal.fire({
+            title: 'Error',
+            text: 'Failed to fetch user data. Please try again later.',
+            icon: 'error',
+            confirmButtonText: 'Okay',
+          });
+        }
+      } finally {
         setIsLoading(false);
-      });
-  }, [navigate]);
+      }
+    };
+
+    fetchUsers();
+  }, [navigate, checkToken]);
 
   const handleNavigation = (url) => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       navigate(url);
     } else {
       Swal.fire({
-        title: "Access Denied",
-        text: "You need to log in to access this page.",
-        icon: "error",
-        confirmButtonText: "Okay",
+        title: 'Access Denied',
+        text: 'You need to log in to access this page.',
+        icon: 'error',
+        confirmButtonText: 'Okay',
       });
     }
   };
@@ -88,7 +100,7 @@ const UserList = () => {
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Total Invested</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Profit 30 Days</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Profit 30 Days</th>
-                <th className="px-4 py-2 text-left font-semibold text-gray-300">referred_by</th>
+                <th className="px-4 py-2 text-left font-semibold text-gray-300">Referred By</th>
                 <th className="px-4 py-2 text-left font-semibold text-gray-300">Actions</th>
               </tr>
             </thead>

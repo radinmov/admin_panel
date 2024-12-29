@@ -13,11 +13,11 @@ function Settings() {
     const [isLoading, setIsLoading] = useState(false);
     const [levels, setLevels] = useState([]);
     useTitle("admin_setting");
-    const { checkToken } = useTokenHandling(); 
+    const { checkToken } = useTokenHandling();
 
     useEffect(() => {
         const fetchLevels = async () => {
-            if (!checkToken()) return; 
+            if (!checkToken()) return;
 
             const token = localStorage.getItem("token");
             try {
@@ -48,10 +48,9 @@ function Settings() {
         fetchLevels();
     }, [checkToken]);
 
-    // Handle level update submission
     const handleLevelSubmit = async (e) => {
         e.preventDefault();
-        if (!checkToken()) return; // Redirect if unauthorized
+        if (!checkToken()) return;
 
         const data = {
             min_active_users: minActiveUser,
@@ -85,6 +84,7 @@ function Settings() {
                     title: "Success",
                     text: `${response.data.msg} (Level ID: ${response.data.level_id})`,
                 });
+                setLevels((prevLevels) => [...prevLevels, response.data]); // Add new level to the table
             } else {
                 Swal.fire({
                     icon: "info",
@@ -113,80 +113,110 @@ function Settings() {
     return (
         <>
             <Sidebar />
-            <div className="h-screen flex items-center justify-center bg-black">
-                <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-96">
-                    <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
-                        Admin Settings
-                    </h2>
+            <div className=" flex items-start bg-black">
+                {/* Main Content Wrapper */}
+                <div className="ml-64 flex flex-col items-center w-full p-4">
+                    <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-2/5">
+                        <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
+                            Admin Settings
+                        </h2>
 
-                    {/* Form for Managing Levels */}
-                    <form onSubmit={handleLevelSubmit}>
-                        <div className="mb-4">
-                            <label className="block text-gray-300 text-sm mb-2">
-                                Min Active User
-                            </label>
-                            <input
-                                type="number"
-                                value={minActiveUser}
-                                onChange={(e) => setMinActiveUser(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
-                                placeholder="Enter minimum active users"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-gray-300 text-sm mb-2">
-                                Min Amount
-                            </label>
-                            <input
-                                type="number"
-                                value={minAmount}
-                                onChange={(e) => setMinAmount(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
-                                placeholder="Enter minimum amount"
-                                required
-                            />
-                        </div>
-
-                        <div className="mb-4">
-                            <label className="block text-gray-300 text-sm mb-2">
-                                Profit Multiplier
-                            </label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                value={profitMultiplier}
-                                onChange={(e) => setProfitMultiplier(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
-                                placeholder="Enter profit multiplier"
-                                required
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={isLoading}
-                            className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
-                                isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
-                            }`}
-                        >
-                            {isLoading ? "Saving..." : "Save Level Settings"}
-                        </button>
-                    </form>
-
-                    {/* Display Levels Information */}
-                    {levels.length > 0 && (
-                        <div className="mt-6">
-                            <h3 className="text-xl text-green-500">Current Level Information</h3>
-                            <div className="text-gray-300">
-                                <p>Min Active Users: {levels[0].min_active_users}</p>
-                                <p>Min Amount: ${levels[0].min_amount}</p>
-                                <p>Profit Multiplier: {levels[0].profit_multiplier}</p>
+                        {/* Form for Managing Levels */}
+                        <form onSubmit={handleLevelSubmit} className="mb-10">
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Min Active User
+                                </label>
+                                <input
+                                    type="number"
+                                    value={minActiveUser}
+                                    onChange={(e) => setMinActiveUser(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    placeholder="Enter minimum active users"
+                                    required
+                                />
                             </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Min Amount
+                                </label>
+                                <input
+                                    type="number"
+                                    value={minAmount}
+                                    onChange={(e) => setMinAmount(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    placeholder="Enter minimum amount"
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Profit Multiplier
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={profitMultiplier}
+                                    onChange={(e) => setProfitMultiplier(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    placeholder="Enter profit multiplier"
+                                    required
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={isLoading}
+                                className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
+                                    isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
+                                }`}
+                            >
+                                {isLoading ? "Saving..." : "Save Level Settings"}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Levels Table */}
+                    {levels.length > 0 && (
+                        <div className="overflow-x-auto w-full mt-8">
+                            <h3 className="text-xl text-green-500 mb-4">Levels Information</h3>
+                            <table className="table-auto w-full text-gray-300 border-collapse border border-gray-700">
+                                <thead>
+                                    <tr className="bg-gray-900">
+                                        <th className="px-4 py-2 border border-gray-700">ID</th>
+                                        <th className="px-4 py-2 border border-gray-700">
+                                            Min Active Users
+                                        </th>
+                                        <th className="px-4 py-2 border border-gray-700">Min Amount</th>
+                                        <th className="px-4 py-2 border border-gray-700">
+                                            Profit Multiplier
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {levels.map((level) => (
+                                        <tr
+                                            key={level.id}
+                                            className="even:bg-gray-800 odd:bg-gray-700"
+                                        >
+                                            <td className="border px-4 py-2 border-gray-700">
+                                                {level.id}
+                                            </td>
+                                            <td className="border px-4 py-2 border-gray-700">
+                                                {level.min_active_users}
+                                            </td>
+                                            <td className="border px-4 py-2 border-gray-700">
+                                                ${level.min_amount}
+                                            </td>
+                                            <td className="border px-4 py-2 border-gray-700">
+                                                {level.profit_multiplier}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>

@@ -102,12 +102,7 @@ const UserTransactions = () => {
                     </table>
                 </div>
 
-                <button
-                    onClick={() => navigate("/admin/home")}
-                    className="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600"
-                >
-                    Back to User List
-                </button>
+
             </div>
         </div>
     );
