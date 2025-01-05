@@ -4,12 +4,12 @@ import Sidebar from "../../Componets/Sidebar";
 // import Tokenhandling
 import { useNavigate } from "react-router-dom";
 import { useTokenHandling } from "../../Componets/token_handling";
+import { BASE_URL } from "../../config";
 
 export const UInvestment = () => {
     const [investmentId, setInvestmentId] = useState("");
     const [amount, setAmount] = useState("");
     const [loading, setLoading] = useState(false);
-    const navigate  = useNavigate();
     const { checkToken } = useTokenHandling(); 
 
 
@@ -21,7 +21,7 @@ export const UInvestment = () => {
             setLoading(true);
 
             const response = await fetch(
-                "http://46.100.94.88:3003/api/v1/admin/investment/update",
+                `http://${BASE_URL}/api/v1/admin/investment/update`,
                 {
                     method: "PUT",
                     headers: {

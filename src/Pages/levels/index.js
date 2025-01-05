@@ -103,12 +103,48 @@ function Settings() {
         }
     };
 
+    const handleDeleteLevel = async (id) => {
+        if (!checkToken()) return;
 
+        const token = localStorage.getItem("token");
+
+        const confirmDelete = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (confirmDelete.isConfirmed) {
+            try {
+                console.log(id);
+                
+                await axios.delete(`${BASE_URL}/api/v1/admin/level/delete/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                Swal.fire("Deleted!", "The level has been deleted.", "success");
+
+                setLevels((prevLevels) => prevLevels.filter((level) => level.id !== id));
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: error.response?.data?.message || "Failed to delete level. Please try again.",
+                });
+            }
+        }
+    };
 
     return (
         <>
             <Sidebar />
-            <div className=" flex items-start bg-black">
+            <div className="flex items-start bg-black">
                 {/* Main Content Wrapper */}
                 <div className="ml-64 flex flex-col items-center w-full p-4">
                     <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-2/5">
@@ -181,13 +217,10 @@ function Settings() {
                                 <thead>
                                     <tr className="bg-gray-900">
                                         <th className="px-4 py-2 border border-gray-700">ID</th>
-                                        <th className="px-4 py-2 border border-gray-700">
-                                            Min Active Users
-                                        </th>
+                                        <th className="px-4 py-2 border border-gray-700">Min Active Users</th>
                                         <th className="px-4 py-2 border border-gray-700">Min Amount</th>
-                                        <th className="px-4 py-2 border border-gray-700">
-                                            Profit Multiplier
-                                        </th>
+                                        <th className="px-4 py-2 border border-gray-700">Profit Multiplier</th>
+                                        <th className="px-4 py-2 border border-gray-700">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,9 +229,7 @@ function Settings() {
                                             key={level.id}
                                             className="even:bg-gray-800 odd:bg-gray-700"
                                         >
-                                            <td className="border px-4 py-2 border-gray-700">
-                                                {level.id}
-                                            </td>
+                                            <td className="border px-4 py-2 border-gray-700">{level.id}</td>
                                             <td className="border px-4 py-2 border-gray-700">
                                                 {level.min_active_users}
                                             </td>
@@ -207,6 +238,14 @@ function Settings() {
                                             </td>
                                             <td className="border px-4 py-2 border-gray-700">
                                                 {level.profit_multiplier}
+                                            </td>
+                                            <td className="border px-4 py-2 border-gray-700">
+                                                <button
+                                                    onClick={() => handleDeleteLevel(level.id)}
+                                                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

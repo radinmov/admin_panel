@@ -31,7 +31,7 @@ const CardCenter = () => {
         }
 
         const response = await axios.get(
-          `http://${BASE_URL}/api/v1/admin/total-informations`,
+          `${BASE_URL}/api/v1/admin/total-informations`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

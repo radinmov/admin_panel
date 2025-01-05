@@ -15,7 +15,6 @@ const UserList = () => {
     const token = localStorage.getItem('token');
 
     if (!checkToken()) return; // Check token before making the API call
-
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/api/v1/admin/users`, {
@@ -64,7 +63,7 @@ const UserList = () => {
     };
 
     fetchUsers();
-  }, [navigate, checkToken]);
+  }, []);
 
   const handleNavigation = (url) => {
     const token = localStorage.getItem('token');
