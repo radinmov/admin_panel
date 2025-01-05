@@ -12,6 +12,7 @@ function Settings() {
     const [profitMultiplier, setProfitMultiplier] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [levels, setLevels] = useState([]);
+    const [editingLevel, setEditingLevel] = useState(null);
     useTitle("admin_setting");
     const { checkToken } = useTokenHandling();
 
@@ -46,7 +47,7 @@ function Settings() {
         };
 
         fetchLevels();
-    }, [checkToken]);
+    }, []);
 
     const handleLevelSubmit = async (e) => {
         e.preventDefault();
@@ -103,49 +104,68 @@ function Settings() {
         }
     };
 
-    const handleDeleteLevel = async (id) => {
+    const handleUpdateLevel = async (e) => {
+        e.preventDefault();
         if (!checkToken()) return;
 
+        const data = {
+            min_active_users: minActiveUser,
+            min_amount: minAmount,
+            profit_multiplier: profitMultiplier,
+        };
         const token = localStorage.getItem("token");
 
-        const confirmDelete = await Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-        });
+        try {
+            setIsLoading(true);
+            Swal.fire({
+                title: "Updating Level...",
+                text: "Please wait while the level is being updated.",
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading(),
+            });
 
-        if (confirmDelete.isConfirmed) {
-            try {
-                console.log(id);
-                
-                await axios.delete(`${BASE_URL}/api/v1/admin/level/delete/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+            await axios.put(`${BASE_URL}/api/v1/admin/levels/${editingLevel.id}`, data, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-                Swal.fire("Deleted!", "The level has been deleted.", "success");
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "The level has been updated successfully.",
+            });
 
-                setLevels((prevLevels) => prevLevels.filter((level) => level.id !== id));
-            } catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Error",
-                    text: error.response?.data?.message || "Failed to delete level. Please try again.",
-                });
-            }
+            setLevels((prevLevels) =>
+                prevLevels.map((level) =>
+                    level.id === editingLevel.id
+                        ? { ...level, ...data }
+                        : level
+                )
+            );
+            setEditingLevel(null);
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: error.response?.data?.message || "Failed to update level. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
         }
+    };
+
+    const openUpdateModal = (level) => {
+        setEditingLevel(level);
+        setMinActiveUser(level.min_active_users);
+        setMinAmount(level.min_amount);
+        setProfitMultiplier(level.profit_multiplier);
     };
 
     return (
         <>
             <Sidebar />
-            <div className="flex items-start bg-black">
-                {/* Main Content Wrapper */}
+            <div className="flex items-start bg-black h-screen">
                 <div className="ml-64 flex flex-col items-center w-full p-4">
                     <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-2/5">
                         <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
@@ -241,10 +261,10 @@ function Settings() {
                                             </td>
                                             <td className="border px-4 py-2 border-gray-700">
                                                 <button
-                                                    onClick={() => handleDeleteLevel(level.id)}
-                                                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                                                    onClick={() => openUpdateModal(level)}
+                                                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
                                                 >
-                                                    Delete
+                                                    Update
                                                 </button>
                                             </td>
                                         </tr>
@@ -255,6 +275,77 @@ function Settings() {
                     )}
                 </div>
             </div>
+
+            {/* Update Modal */}
+            {editingLevel && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center">
+                    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-1/3">
+                        <h2 className="text-xl font-bold text-green-500 mb-4">Update Level</h2>
+                        <form onSubmit={handleUpdateLevel}>
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Min Active User
+                                </label>
+                                <input
+                                    type="number"
+                                    value={minActiveUser}
+                                    onChange={(e) => setMinActiveUser(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Min Amount
+                                </label>
+                                <input
+                                    type="number"
+                                    value={minAmount}
+                                    onChange={(e) => setMinAmount(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-gray-300 text-sm mb-2">
+                                    Profit Multiplier
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={profitMultiplier}
+                                    onChange={(e) => setProfitMultiplier(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                    required
+                                />
+                            </div>
+
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setEditingLevel(null)}
+                                    className="bg-gray-600 text-white px-4 py-2 rounded-lg"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className={`px-4 py-2 rounded-lg text-white font-semibold ${
+                                        isLoading
+                                            ? "bg-gray-600"
+                                            : "bg-green-500 hover:bg-green-600"
+                                    }`}
+                                >
+                                    {isLoading ? "Updating..." : "Update"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
