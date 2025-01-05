@@ -8,17 +8,17 @@ import { Chat } from "./Pages/Chat";
 import Investment from './Pages/Investemnt';
 import { UInvestment } from "./Pages/Investemnt_update";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Register } from "./Pages/register";
+// import { Register } from "./Pages/register";
 
 const routes = createBrowserRouter([
   {
     path: '/',
     element: <SignIn />
   },
-  {
-    path: '/register',
-    element: <Register />
-  },
+  // {
+  //   path: '/register',
+  //   element: <Register />
+  // },
   {
     path: '/admin/home',
     element: <Home />

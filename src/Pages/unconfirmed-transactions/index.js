@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Sidebar from '../../Componets/Sidebar/index';
 import useTitle from '../../Componets/Hook/useTitle';
 import Swal from 'sweetalert2';
@@ -29,8 +28,8 @@ const UnconfirmedTransactions = () => {
             })
             .then((response) => response.json()) 
             .then((data) => {
-                setUnconfirmedTransactions(data.unconfirmed_transactions)
-                 setLoading(false);
+                setUnconfirmedTransactions(data.unconfirmed_transactions);
+                setLoading(false);
             })
             .catch((err) => {
                 setError('Failed to fetch unconfirmed transactions');
@@ -53,14 +52,18 @@ const UnconfirmedTransactions = () => {
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
+                console.log(id);
+                
                 const token = localStorage.getItem('token');
-                fetch(`${BASE_URL}/api/v1/admin/unc_tran/delete`, {
+                fetch(`${BASE_URL}/api/v1/admin/unc_tran/delete/${id}`, {
                     method: 'DELETE',
                     headers: {
                         Authorization: `Bearer ${token}`,
                     }
                 })
                 .then((response) => {
+                    console.log(response);
+                    
                     if (response.ok) {
                         setUnconfirmedTransactions((prevTransactions) =>
                             prevTransactions.filter((transaction) => transaction.id !== id)
@@ -72,6 +75,42 @@ const UnconfirmedTransactions = () => {
                 })
                 .catch((err) => {
                     Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
+                    console.error('Error:', err);
+                });
+            }
+        });
+    };
+
+    const deleteAllTransactions = () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "This will delete all unconfirmed transactions!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete all!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const token = localStorage.getItem('token');
+                fetch(`${BASE_URL}/api/v1/admin/unc_tran/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                })
+                .then((response) => {
+                    console.log(response);
+                    
+                    if (response.ok) {
+                        setUnconfirmedTransactions([]);
+                        Swal.fire('Deleted!', 'All unconfirmed transactions have been deleted.', 'success');
+                    } else {
+                        Swal.fire('Failed!', 'Failed to delete all transactions.', 'error');
+                    }
+                })
+                .catch((err) => {
+                    Swal.fire('Failed!', 'Failed to delete all transactions.', 'error');
                     console.error('Error:', err);
                 });
             }
@@ -101,7 +140,15 @@ const UnconfirmedTransactions = () => {
         <div className="flex">
             <Sidebar />
             <div className="flex-1 ml-64 p-8 bg-black min-h-screen">
-                <h1 className="text-2xl font-bold mb-4 text-lime-500">Unconfirmed Transactions</h1>
+                <div className="flex justify-between items-center mb-4">
+                    <h1 className="text-2xl font-bold text-lime-500">Unconfirmed Transactions</h1>
+                    <button
+                        className="bg-red-500 text-black px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-red-500"
+                        onClick={deleteAllTransactions}
+                    >
+                        Delete All
+                    </button>
+                </div>
                 <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-lg">
                     <table className="min-w-full table-auto">
                         <thead>

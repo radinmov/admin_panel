@@ -4,7 +4,6 @@ import Swal from 'sweetalert2';
 import Sidebar from '../../Componets/Sidebar';
 import useTitle from '../../Componets/Hook/useTitle';
 import { BASE_URL } from '../../config';
-import { useNavigate } from 'react-router-dom';
 import { useTokenHandling } from '../../Componets/token_handling';
 
 
@@ -13,7 +12,6 @@ const Investment = () => {
     const [investments, setInvestments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const navigate = useNavigate();
     const { checkToken } = useTokenHandling();
 
 
