@@ -84,7 +84,7 @@ function Settings() {
                     title: "Success",
                     text: `${response.data.msg} (Level ID: ${response.data.level_id})`,
                 });
-                setLevels((prevLevels) => [...prevLevels, response.data]); // Add new level to the table
+                setLevels((prevLevels) => [...prevLevels, response.data]);
             } else {
                 Swal.fire({
                     icon: "info",

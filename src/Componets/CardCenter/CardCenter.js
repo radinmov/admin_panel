@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import Card from "../Card/Cart";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../config";
 
 const CardCenter = () => {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ const CardCenter = () => {
         }
 
         const response = await axios.get(
-          "http://46.100.94.88:3003/api/v1/admin/total-informations",
+          `http://${BASE_URL}/api/v1/admin/total-informations`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
