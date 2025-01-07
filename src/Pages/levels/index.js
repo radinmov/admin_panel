@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import useTitle from "../../Componets/Hook/useTitle";
-import Sidebar from "../../Componets/Sidebar";
-import { BASE_URL } from "../../config";
 import Swal from "sweetalert2";
-import { useTokenHandling } from "../../Componets/token_handling";
+import Sidebar from "../../Componets/Sidebar/index";
+import  useTitle  from "../../Componets/Hook/useTitle";
+import { useTokenHandling } from "../../Componets/token_handling/index";
+import { BASE_URL } from '../../config';
+
 
 function Settings() {
     const [minActiveUser, setMinActiveUser] = useState("");
@@ -14,6 +15,8 @@ function Settings() {
     const [levels, setLevels] = useState([]);
     const [editingLevel, setEditingLevel] = useState(null);
     useTitle("admin_setting");
+
+
     const { checkToken } = useTokenHandling();
 
     useEffect(() => {
@@ -47,18 +50,25 @@ function Settings() {
         };
 
         fetchLevels();
-    }, []);
+    }, [checkToken]);
+
+    const resetForm = () => {
+        setMinActiveUser("");
+        setMinAmount("");
+        setProfitMultiplier("");
+        setEditingLevel(null);
+    };
 
     const handleLevelSubmit = async (e) => {
         e.preventDefault();
         if (!checkToken()) return;
 
+        const token = localStorage.getItem("token");
         const data = {
             min_active_users: minActiveUser,
             min_amount: minAmount,
             profit_multiplier: profitMultiplier,
         };
-        const token = localStorage.getItem("token");
 
         try {
             setIsLoading(true);
@@ -69,35 +79,24 @@ function Settings() {
                 didOpen: () => Swal.showLoading(),
             });
 
-            const response = await axios.post(
-                `${BASE_URL}/api/v1/admin/levels`,
-                data,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const response = await axios.post(`${BASE_URL}/api/v1/admin/levels`, data, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
-            if (response.data && response.data.level_id && response.data.msg) {
+            if (response.data && response.data.msg) {
                 Swal.fire({
                     icon: "success",
                     title: "Success",
                     text: `${response.data.msg} (Level ID: ${response.data.level_id})`,
                 });
-                setLevels((prevLevels) => [...prevLevels, response.data]);
-            } else {
-                Swal.fire({
-                    icon: "info",
-                    title: "Settings Updated",
-                    text: "Your settings have been updated successfully.",
-                });
+                setLevels([...levels, response.data]);
+                resetForm();
             }
         } catch (error) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: error.response?.data?.message || "Failed to update settings. Please try again.",
+                text: error.response?.data?.message || "Failed to save settings.",
             });
         } finally {
             setIsLoading(false);
@@ -108,12 +107,12 @@ function Settings() {
         e.preventDefault();
         if (!checkToken()) return;
 
+        const token = localStorage.getItem("token");
         const data = {
             min_active_users: minActiveUser,
             min_amount: minAmount,
             profit_multiplier: profitMultiplier,
         };
-        const token = localStorage.getItem("token");
 
         try {
             setIsLoading(true);
@@ -125,9 +124,7 @@ function Settings() {
             });
 
             await axios.put(`${BASE_URL}/api/v1/admin/levels/${editingLevel.id}`, data, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             Swal.fire({
@@ -136,19 +133,17 @@ function Settings() {
                 text: "The level has been updated successfully.",
             });
 
-            setLevels((prevLevels) =>
-                prevLevels.map((level) =>
-                    level.id === editingLevel.id
-                        ? { ...level, ...data }
-                        : level
+            setLevels(
+                levels.map((level) =>
+                    level.id === editingLevel.id ? { ...level, ...data } : level
                 )
             );
-            setEditingLevel(null);
+            resetForm();
         } catch (error) {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: error.response?.data?.message || "Failed to update level. Please try again.",
+                text: error.response?.data?.message || "Failed to update level.",
             });
         } finally {
             setIsLoading(false);
@@ -163,94 +158,114 @@ function Settings() {
     };
 
     return (
-        <>
+        <div className="flex bg-black h-screen">
             <Sidebar />
-            <div className="flex bg-black min-h-screen">
-                {/* Sidebar */}
-                <div className="fixed top-0 left-0 h-screen w-64">
-                    <Sidebar />
-                </div>
+            <div className="ml-64 flex flex-col w-full p-4">
+                <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-2xl mx-auto">
+                    <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
+                        Admin Settings
+                    </h2>
 
-                {/* Main Content */}
-                <div className="ml-64 flex flex-col w-full p-4 overflow-y-auto">
-                    <div className="bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-2xl mx-auto">
-                        <h2 className="text-3xl font-extrabold text-green-500 text-center mb-6">
-                            Admin Settings
-                        </h2>
+                    {/* Create Level Button */}
+                    <button
+                        className="bg-blue-500 px-4 py-2 rounded-lg text-white mb-4 hover:bg-blue-600"
+                        onClick={resetForm}
+                    >
+                        Create Level
+                    </button>
 
-                        <form onSubmit={handleLevelSubmit} className="mb-10">
-                            <div className="mb-4">
-                                <label className="block text-gray-300 text-sm mb-2">
-                                    Min Active User
-                                </label>
-                                <input
-                                    type="number"
-                                    value={minActiveUser}
-                                    onChange={(e) => setMinActiveUser(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
-                                    placeholder="Enter minimum active users"
-                                    required
-                                />
-                            </div>
-
-                            {/* Add similar divs for other inputs */}
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
-                                    }`}
-                            >
-                                {isLoading ? "Saving..." : "Save Level Settings"}
-                            </button>
-                        </form>
-                    </div>
-
-                    {/* Levels Table */}
-                    {levels.length > 0 && (
-                        <div className="overflow-x-auto w-full mt-8">
-                            <h3 className="text-xl text-green-500 mb-4">Levels Information</h3>
-                            <table className="table-auto w-full text-gray-300 border-collapse border border-gray-700">
-                                <thead>
-                                    <tr className="bg-gray-900">
-                                        <th className="px-4 py-2 border border-gray-700">ID</th>
-                                        <th className="px-4 py-2 border border-gray-700">Min Active Users</th>
-                                        <th className="px-4 py-2 border border-gray-700">Min Amount</th>
-                                        <th className="px-4 py-2 border border-gray-700">Profit Multiplier</th>
-                                        <th className="px-4 py-2 border border-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {levels.map((level) => (
-                                        <tr key={level.id} className="even:bg-gray-800 odd:bg-gray-700">
-                                            <td className="border px-4 py-2 border-gray-700">{level.id}</td>
-                                            <td className="border px-4 py-2 border-gray-700">
-                                                {level.min_active_users}
-                                            </td>
-                                            <td className="border px-4 py-2 border-gray-700">
-                                                ${level.min_amount}
-                                            </td>
-                                            <td className="border px-4 py-2 border-gray-700">
-                                                {level.profit_multiplier}
-                                            </td>
-                                            <td className="border px-4 py-2 border-gray-700">
-                                                <button
-                                                    onClick={() => openUpdateModal(level)}
-                                                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                                                >
-                                                    Update
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                    {/* Add/Update Level Form */}
+                    <form onSubmit={editingLevel ? handleUpdateLevel : handleLevelSubmit}>
+                        <div className="mb-4">
+                            <label className="block text-gray-300 text-sm mb-2">
+                                Min Active Users
+                            </label>
+                            <input
+                                type="number"
+                                value={minActiveUser}
+                                onChange={(e) => setMinActiveUser(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                placeholder="Enter minimum active users"
+                                required
+                            />
                         </div>
-                    )}
+                        <div className="mb-4">
+                            <label className="block text-gray-300 text-sm mb-2">
+                                Min Amount
+                            </label>
+                            <input
+                                type="number"
+                                value={minAmount}
+                                onChange={(e) => setMinAmount(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                placeholder="Enter minimum amount"
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-gray-300 text-sm mb-2">
+                                Profit Multiplier
+                            </label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={profitMultiplier}
+                                onChange={(e) => setProfitMultiplier(e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 bg-black"
+                                placeholder="Enter profit multiplier"
+                                required
+                            />
+                        </div>
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className={`w-full text-white font-semibold py-2 rounded-lg transition duration-300 ${
+                                isLoading ? "bg-gray-600" : "bg-green-500 hover:bg-green-600"
+                            }`}
+                        >
+                            {isLoading ? "Saving..." : editingLevel ? "Update Level" : "Save Level"}
+                        </button>
+                    </form>
+
+                    {/* Display Levels */}
+                    <table className="w-full mt-8 border border-gray-600 text-gray-300">
+                        <thead>
+                            <tr>
+                                <th className="border border-gray-600 px-4 py-2">ID</th>
+                                <th className="border border-gray-600 px-4 py-2">Min Active Users</th>
+                                <th className="border border-gray-600 px-4 py-2">Min Amount</th>
+                                <th className="border border-gray-600 px-4 py-2">Profit Multiplier</th>
+                                <th className="border border-gray-600 px-4 py-2">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {levels.map((level) => (
+                                <tr key={level.id} className="even:bg-gray-800 odd:bg-gray-700">
+                                    <td className="border border-gray-700 px-4 py-2">{level.id}</td>
+                                    <td className="border border-gray-700 px-4 py-2">
+                                        {level.min_active_users}
+                                    </td>
+                                    <td className="border border-gray-700 px-4 py-2">
+                                        {level.min_amount}
+                                    </td>
+                                    <td className="border border-gray-700 px-4 py-2">
+                                        {level.profit_multiplier}
+                                    </td>
+                                    <td className="border border-gray-700 px-4 py-2 text-center">
+                                        <button
+                                            className="bg-blue-500 px-4 py-2 rounded-lg text-white hover:bg-blue-600"
+                                            onClick={() => openUpdateModal(level)}
+                                        >
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            )}
-        </>
+        </div>
     );
 }
 
