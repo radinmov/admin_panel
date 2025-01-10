@@ -16,7 +16,6 @@ const UserTransactions = () => {
     const [error, setError] = useState(null);
     const { checkToken } = useTokenHandling();
 
-
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
@@ -24,11 +23,14 @@ const UserTransactions = () => {
 
                 if (!checkToken()) return;
                 const token = localStorage.getItem("token");
-                const response = await axios.get(`${BASE_URL}/api/v1/admin/users/${userId}/transactions`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const response = await axios.get(
+                    `${BASE_URL}/api/v1/admin/users/${userId}/transactions`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
 
                 const data = response.data.transactions || [];
                 setTransactions(data);
@@ -52,6 +54,26 @@ const UserTransactions = () => {
             });
         }
     }, [error]);
+
+    // Helper function to format dates
+    const formatDate = (dateString) => {
+        if (!dateString) return "Not confirmed yet";
+        const date = new Date(dateString);
+        return date.toLocaleString(); // Converts to a user-friendly format (e.g., "Tue, 07 Jan 2025 08:52:22 GMT")
+    };
+
+    // Helper function to render status
+    const renderTransactionStatus = (confirmed, confirmDate) => {
+        if (confirmed) {
+            return (
+                <div className="text-green-500 font-bold">
+                    Confirmed - {formatDate(confirmDate)}
+                </div>
+            );
+        } else {
+            return <div className="text-red-500 font-bold">Not confirmed yet</div>;
+        }
+    };
 
     if (isLoading) {
         return (
@@ -77,8 +99,9 @@ const UserTransactions = () => {
                             <tr className="bg-gray-200">
                                 <th className="px-4 py-2 text-left">Transaction ID</th>
                                 <th className="px-4 py-2 text-left">Amount</th>
-                                <th className="px-4 py-2 text-left">Date</th>
+                                <th className="px-4 py-2 text-left">Request Date</th>
                                 <th className="px-4 py-2 text-left">Status</th>
+                                <th className="px-4 py-2 text-left">Type</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,14 +109,22 @@ const UserTransactions = () => {
                                 transactions.map((transaction) => (
                                     <tr key={transaction.id} className="border-b">
                                         <td className="px-4 py-2">{transaction.id}</td>
-                                        <td className="px-4 py-2">{transaction.amount}</td>
-                                        <td className="px-4 py-2">{new Date(transaction.date).toLocaleString()}</td>
-                                        <td className="px-4 py-2">{transaction.status}</td>
+                                        <td className="px-4 py-2">{transaction.amount}$</td>
+                                        <td className="px-4 py-2">
+                                            {formatDate(transaction.request_date)}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            {renderTransactionStatus(
+                                                transaction.confirmed,
+                                                transaction.confirm_date
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-2">{transaction.type}</td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan="4" className="px-4 py-2 text-center">
+                                    <td colSpan="5" className="px-4 py-2 text-center">
                                         No transactions found.
                                     </td>
                                 </tr>
@@ -101,8 +132,6 @@ const UserTransactions = () => {
                         </tbody>
                     </table>
                 </div>
-
-
             </div>
         </div>
     );

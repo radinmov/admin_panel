@@ -6,18 +6,22 @@ export const useTokenHandling = () => {
 
     const checkToken = () => {
         const token = localStorage.getItem("token");
-        if (!token) {
+
+        if (!token || token.length <= 228) {
             Swal.fire({
                 icon: "warning",
                 title: "Unauthorized",
-                text: "You need to log in to access this page.",
+                text: "Invalid or expired token. Please log in again.",
                 confirmButtonText: "Log In",
             }).then(() => {
-                navigate("/"); // Redirect to login page
+                localStorage.removeItem("token");
+
+                navigate("/");
             });
-            return false; // Indicate the user is unauthorized
+            return false;
         }
-        return true; // Indicate the user is authorized
+
+        return true;
     };
 
     return { checkToken };

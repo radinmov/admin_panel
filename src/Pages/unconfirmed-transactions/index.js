@@ -7,11 +7,13 @@ import { useTokenHandling } from '../../Componets/token_handling';
 import { BASE_URL } from '../../config';
 
 const UnconfirmedTransactions = () => {
-    useTitle("admin_Login");
+    useTitle("UnconfirmedTransactions");
     const navigate = useNavigate();
     const [unconfirmedTransactions, setUnconfirmedTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [hashCode, setHashCode] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { checkToken } = useTokenHandling();
 
     useEffect(() => {
@@ -26,18 +28,18 @@ const UnconfirmedTransactions = () => {
                     Authorization: `Bearer ${token}`,
                 }
             })
-            .then((response) => response.json()) 
-            .then((data) => {
-                setUnconfirmedTransactions(data.unconfirmed_transactions);
-                setLoading(false);
-            })
-            .catch((err) => {
-                setError('Failed to fetch unconfirmed transactions');
-                setLoading(false);
-                console.error('Error:', err);
-            });
+                .then((response) => response.json())
+                .then((data) => {
+                    setUnconfirmedTransactions(data.unconfirmed_transactions);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    setError('Failed to fetch unconfirmed transactions');
+                    setLoading(false);
+                    console.error('Error:', err);
+                });
         };
-        
+
         fetchUnconfirmedTransactions();
     }, []);
 
@@ -52,8 +54,6 @@ const UnconfirmedTransactions = () => {
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(id);
-                
                 const token = localStorage.getItem('token');
                 fetch(`${BASE_URL}/api/v1/admin/unc_tran/delete/${id}`, {
                     method: 'DELETE',
@@ -61,22 +61,20 @@ const UnconfirmedTransactions = () => {
                         Authorization: `Bearer ${token}`,
                     }
                 })
-                .then((response) => {
-                    console.log(response);
-                    
-                    if (response.ok) {
-                        setUnconfirmedTransactions((prevTransactions) =>
-                            prevTransactions.filter((transaction) => transaction.id !== id)
-                        );
-                        Swal.fire('Deleted!', 'The transaction has been deleted.', 'success');
-                    } else {
+                    .then((response) => {
+                        if (response.ok) {
+                            setUnconfirmedTransactions((prevTransactions) =>
+                                prevTransactions.filter((transaction) => transaction.id !== id)
+                            );
+                            Swal.fire('Deleted!', 'The transaction has been deleted.', 'success');
+                        } else {
+                            Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
+                        }
+                    })
+                    .catch((err) => {
                         Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
-                    }
-                })
-                .catch((err) => {
-                    Swal.fire('Failed!', 'Failed to delete the transaction.', 'error');
-                    console.error('Error:', err);
-                });
+                        console.error('Error:', err);
+                    });
             }
         });
     };
@@ -99,22 +97,34 @@ const UnconfirmedTransactions = () => {
                         Authorization: `Bearer ${token}`,
                     }
                 })
-                .then((response) => {
-                    console.log(response);
-                    
-                    if (response.ok) {
-                        setUnconfirmedTransactions([]);
-                        Swal.fire('Deleted!', 'All unconfirmed transactions have been deleted.', 'success');
-                    } else {
+                    .then((response) => {
+                        if (response.ok) {
+                            setUnconfirmedTransactions([]);
+                            Swal.fire('Deleted!', 'All unconfirmed transactions have been deleted.', 'success');
+                        } else {
+                            Swal.fire('Failed!', 'Failed to delete all transactions.', 'error');
+                        }
+                    })
+                    .catch((err) => {
                         Swal.fire('Failed!', 'Failed to delete all transactions.', 'error');
-                    }
-                })
-                .catch((err) => {
-                    Swal.fire('Failed!', 'Failed to delete all transactions.', 'error');
-                    console.error('Error:', err);
-                });
+                        console.error('Error:', err);
+                    });
             }
         });
+    };
+
+    const showHashCode = (hash_code) => {
+        if (hash_code) {
+            setHashCode(hash_code);
+        } else {
+            setHashCode('Hash code is not available');
+        }
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setHashCode('');
     };
 
     useEffect(() => {
@@ -157,7 +167,7 @@ const UnconfirmedTransactions = () => {
                                 <th className="px-4 py-2 text-left text-lime-500">Description</th>
                                 <th className="px-4 py-2 text-left text-lime-500">Request Date</th>
                                 <th className="px-4 py-2 text-left text-lime-500">Type</th>
-                                <th className="px-4 py-2 text-left text-lime-500">User ID</th>
+                                <th className="px-4 py-2 text-left text-lime-500">User Name</th>
                                 <th className="px-4 py-2 text-left text-lime-500">Transaction ID</th>
                                 <th className="px-4 py-2 text-left text-lime-500">Actions</th>
                             </tr>
@@ -170,7 +180,7 @@ const UnconfirmedTransactions = () => {
                                         <td className="px-4 py-2 text-white">{transaction.description}</td>
                                         <td className="px-4 py-2 text-white">{transaction.request_date}</td>
                                         <td className="px-4 py-2 text-white">{transaction.type}</td>
-                                        <td className="px-4 py-2 text-white">{transaction.user_id}</td>
+                                        <td className="px-4 py-2 text-white">{transaction.user_name}</td>
                                         <td className="px-4 py-2 text-white">{transaction.id}</td>
                                         <td className="px-4 py-2 flex space-x-2">
                                             <button
@@ -184,6 +194,12 @@ const UnconfirmedTransactions = () => {
                                                 onClick={() => deleteTransaction(transaction.id)}
                                             >
                                                 Delete
+                                            </button>
+                                            <button
+                                                className="bg-blue-500 text-black px-4 py-2 border-2 border-white rounded hover:bg-white hover:text-green-500"
+                                                onClick={() => showHashCode(transaction.hash_code)}
+                                            >
+                                                Hash code
                                             </button>
                                         </td>
                                     </tr>
@@ -199,6 +215,20 @@ const UnconfirmedTransactions = () => {
                     </table>
                 </div>
             </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center">
+                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                        <h2 className="text-xl font-bold mb-4">Transaction Hash code is :</h2>
+                        <p className="text-gray-700">{hashCode}</p>
+                        <button
+                            className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                            onClick={closeModal}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -14,7 +14,7 @@ const UserList = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    if (!checkToken()) return; // Check token before making the API call
+    if (!checkToken()) return; 
     const fetchUsers = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/api/v1/admin/users`, {
@@ -24,7 +24,6 @@ const UserList = () => {
           },
         });
 
-        // Handle the response data correctly
         if (Array.isArray(response.data)) {
           setUsers(response.data);
         } else if (response.data && Array.isArray(response.data.users)) {
